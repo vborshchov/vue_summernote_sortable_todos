@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css">
+  <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  <style>
+    .text-primary {
+      text-decoration: line-through;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+      <div id="todos"><ul class="list-group">
+          <li
+              v-for="task in tasks"
+              class="list-group-item"
+              data-id="{{$index}}"
+              >
+              <span
+                  @dblclick="editTask = task"
+                  v-show="task != editTask"
+                  v-bind:class="{ 'text-primary': task.done }"
+                  >
+                  <span
+                      @click="task.done = !task.done"
+                      class="glyphicon glyphicon-ok"
+                      ></span>
+                  {{ task.title }}
+                  <span @click="removeTask($index)" class="close">&times;</span>
+              </span>
+              <input
+                  v-show="task == editTask"
+                  v-model="editTask.title"
+                  @keyup.enter="editTask = null"
+                  class="form-control"
+                  type="text">
+          </li>
+      </ul>
+
+      <form @submit="addTask">
+        <input v-model="newTask" class="form-control" type="text" placeholder="Add some task">
+      </form>
+      <div v-summernote></div>
+      <pre>{{tasks | json}}</pre>
+      <pre>{{editor}}</pre>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.min.js"></script>
+  <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
