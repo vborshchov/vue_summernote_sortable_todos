@@ -8,46 +8,54 @@
   <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <style>
     .text-primary {
-      text-decoration: line-through;
-      color: #999;
+      color: #bbb;
+    }
+    .wrapper {
+      position: relative;
+    }
+
+    .glyphicon-ok {
+      position: absolute;
+      top: 40%;
+      left: -1%;
+    }
+
+    .close {
+      position: absolute;
+      top: 40%;
+      right: 1%;
+    }
+
+    .note-editor {
+      display: inline-block;
+      margin: 10px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-      <div id="todos"><ul class="list-group">
-          <li
-              v-for="task in tasks"
-              class="list-group-item"
-              data-id="{{$index}}"
-              >
-              <span
-                  @dblclick="editTask = task"
-                  v-show="task != editTask"
+    <div id="todos"><ul class="list-group">
+      <li
+          v-for="task in tasks"
+          class="list-group-item"
+          data-id="{{$index}}"
+          >
+          <div v-bind:class="{ 'text-primary': task.done }" class="wrapper">
+               <span
+                  @click="task.done = !task.done"
+                  class="glyphicon glyphicon-ok"
                   v-bind:class="{ 'text-primary': task.done }"
-                  >
-                  <span
-                      @click="task.done = !task.done"
-                      class="glyphicon glyphicon-ok"
-                      ></span>
-                  {{ task.title }}
-                  <span @click="removeTask($index)" class="close">&times;</span>
-              </span>
-              <input
-                  v-show="task == editTask"
-                  v-model="editTask.title"
-                  @keyup.enter="editTask = null"
-                  class="form-control"
-                  type="text">
-          </li>
+                  ></span>
+              <span v-summernote></span>
+              <span @click="removeTask($index)" class="close">&times;</span>
+          </div>
+      </li>
       </ul>
 
       <form @submit="addTask">
         <input v-model="newTask" class="form-control" type="text" placeholder="Add some task">
       </form>
-      <div v-summernote></div>
       <pre>{{tasks | json}}</pre>
-      <pre>{{editor}}</pre>
     </div>
   </div>
   <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
