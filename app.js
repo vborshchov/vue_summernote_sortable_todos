@@ -1,6 +1,7 @@
 Vue.directive('summernote', {
   bind: function() {
-    console.log(this.el)
+    var scope = this._scope;
+    var it = this;
     this.editor = $(this.el).summernote({
       airMode: true,
       disableDragAndDrop: true,
@@ -11,14 +12,14 @@ Vue.directive('summernote', {
       },
       callbacks: {
         onInit: function() {
-          console.log('init summernote')
+          // this.innerHTML = scope.task.title;
+          $(this).next().find('.note-editable').html(scope.task.title);
         },
         onKeyup: function(e) {
           // console.log(e.keyCode)
         },
         onChange: function(contents, $editable) {
-          console.log(contents)
-          vm.editor = contents;
+          scope.task.title = contents;
         }
       }
     });
@@ -34,7 +35,6 @@ var vm = new Vue({
       animation: 500,
       onUpdate: function(e) {
         var oldPosition = e.item.getAttribute('data-id');
-        console.log(oldPosition)
         var newPosition = this.toArray().indexOf(oldPosition);
         vm.tasks.splice(newPosition, 0, vm.tasks.splice(oldPosition, 1)[0]);
       }
@@ -43,42 +43,34 @@ var vm = new Vue({
 
   data: {
     tasks: [
-      { title: 'First task', done: true },
-      { title: 'Second task', done: true },
+      { title: 'First <b>task</b>', done: true },
+      { title: 'Sec<u>ond t</u>ask', done: true },
       { title: 'Third task', done: false }
     ],
     newTask: '',
-    editTask: null,
-    editor: null
+    editTask: null
   },
 
   methods: {
     addTask (e) {
-      e.preventDefault()
-      this.tasks.push({ title: this.newTask, done: false })
-      this.newTask = ''
+      e.preventDefault();
+      this.tasks.push({ title: this.newTask, done: false });
+      this.newTask = '';
     },
 
     removeTask (index) {
-      this.tasks.splice(index, 1)
+      this.tasks.splice(index, 1);
     },
     handleEsc(index){
-      console.log(index)
+      console.log(index);
     }
   },
 
   filters: {
     openTasks () {
       return this.tasks.filter(function (item) {
-        return item.done
-      })
+        return item.done;
+      });
     }
   }
-})
-
-
-
-
-$('#summernote').summernote({
-  airMode: true
 })

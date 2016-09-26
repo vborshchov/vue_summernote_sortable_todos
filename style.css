@@ -1,0 +1,23 @@
+.text-primary {
+  color: #bbb;
+}
+.wrapper {
+  position: relative;
+}
+
+.glyphicon-ok {
+  position: absolute;
+  top: 40%;
+  left: -2%;
+}
+
+.close {
+  position: absolute;
+  top: 40%;
+  right: 1%;
+}
+
+.note-editor {
+  display: inline-block;
+  margin: 10px;
+}
