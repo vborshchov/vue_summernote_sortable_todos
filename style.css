@@ -5,10 +5,10 @@
   position: relative;
 }
 
-.glyphicon-ok {
-  position: absolute;
-  top: 40%;
-  left: -2%;
+li.thought {
+  width: 50%;
+  margin: 10px auto;
+  position: relative;
 }
 
 .close {
@@ -18,6 +18,26 @@
 }
 
 .note-editor {
+  text-align: center;
   display: inline-block;
-  margin: 10px;
+  margin: 10px auto;
+  width: 95%;
+}
+
+.note-editable {
+  border: 1px solid red;
+}
+
+.note-editable p {
+  margin: 0 auto;
+}
+
+.glyphicon-move {
+  position: absolute;
+  top: 40%;
+  right: 0px;
+}
+
+.glyphicon-move:hover {
+  cursor: move;
 }

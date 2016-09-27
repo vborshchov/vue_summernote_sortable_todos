@@ -12,26 +12,22 @@
   <div class="container">
     <div id="todos"><ul class="list-group">
       <li
-          v-for="task in tasks"
-          class="list-group-item"
+          v-for="thought in thoughts"
+          class="list-group-item thought"
           data-id="{{$index}}"
           >
-          <div v-bind:class="{ 'text-primary': task.done }" class="wrapper">
-               <span
-                  @click="task.done = !task.done"
-                  class="glyphicon glyphicon-ok"
-                  v-bind:class="{ 'text-primary': task.done }"
-                  ></span>
+          <div v-bind:class="{ 'text-primary': thought.done }" class="wrapper">
               <span v-summernote></span>
-              <span @click="removeTask($index)" class="close">&times;</span>
+              <span class="glyphicon glyphicon-move"></span>
+              <!-- <span @click="removeThought($index)" class="close">&times;</span> -->
           </div>
       </li>
       </ul>
 
-      <form @submit="addTask">
-        <input v-model="newTask" class="form-control" type="text" placeholder="Add some task">
+      <form @submit="addThought">
+        <input v-model="newThought" class="form-control" type="text" placeholder="Add some thought">
       </form>
-      <pre>{{tasks | json}}</pre>
+      <pre>{{thoughts | json}}</pre>
     </div>
   </div>
   <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>

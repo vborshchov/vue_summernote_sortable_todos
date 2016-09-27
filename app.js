@@ -1,4 +1,5 @@
 Vue.directive('summernote', {
+  terminal: true,
   bind: function() {
     var scope = this._scope;
     var it = this;
@@ -12,14 +13,17 @@ Vue.directive('summernote', {
       },
       callbacks: {
         onInit: function() {
-          // this.innerHTML = scope.task.title;
-          $(this).next().find('.note-editable').html(scope.task.title);
+          // this.innerHTML = scope.thought.title;
+          $(this).next().find('.note-editable').html(scope.thought.name);
         },
         onKeyup: function(e) {
-          // console.log(e.keyCode)
+          var $it = $(this);
+          var $editor = $it.next('.note-editor').find('.note-editable');
+          var lines = $editor.getLines();
+          console.log(lines);
         },
         onChange: function(contents, $editable) {
-          scope.task.title = contents;
+          scope.thought.name = contents;
         }
       }
     });
@@ -31,46 +35,74 @@ var vm = new Vue({
 
   ready: function (value) {
     Sortable.create(this.$el.firstChild, {
+      handle: ".glyphicon-move",
       draggable: 'li',
       animation: 500,
       onUpdate: function(e) {
         var oldPosition = e.item.getAttribute('data-id');
         var newPosition = this.toArray().indexOf(oldPosition);
-        vm.tasks.splice(newPosition, 0, vm.tasks.splice(oldPosition, 1)[0]);
+        vm.thoughts.splice(newPosition, 0, vm.thoughts.splice(oldPosition, 1)[0]);
       }
     });
   },
 
   data: {
-    tasks: [
-      { title: 'First <b>task</b>', done: true },
-      { title: 'Sec<u>ond t</u>ask', done: true },
-      { title: 'Third task', done: false }
+    thoughts: [
+      {
+        imageUrl: null,
+        name: 'First thought',
+        author: null
+      },
+      {
+        imageUrl: null,
+        name: '<b>Second</b> thought',
+        author: null
+      },
+      {
+        imageUrl: null,
+        name: 'Third thought',
+        author: null
+      },
+      {
+        imageUrl: null,
+        name: 'Fourth thought',
+        author: null
+      }
     ],
-    newTask: '',
-    editTask: null
+    newThought: ''
   },
 
   methods: {
-    addTask (e) {
+    addThought (e) {
       e.preventDefault();
-      this.tasks.push({ title: this.newTask, done: false });
-      this.newTask = '';
+      this.thoughts.push({ name: this.newThought, imageUrl: null, author: null });
+      this.newThought = '';
     },
 
-    removeTask (index) {
-      this.tasks.splice(index, 1);
-    },
-    handleEsc(index){
-      console.log(index);
-    }
-  },
-
-  filters: {
-    openTasks () {
-      return this.tasks.filter(function (item) {
-        return item.done;
-      });
+    removeThought (index) {
+      this.thoughts.splice(index, 1);
     }
   }
-})
+});
+
+Vue.config.debug = true;
+
+$.fn.extend({
+  getLines: function() {
+    var it = this[0];
+    var lastChild = it.lastChild;
+    var range = document.createRange();
+    var lineHeight = parseInt(this.css('line-height'));
+    if (isNaN(lineHeight)) {
+      return 0;
+    } else {
+      if (lastChild) {
+        range.setStart(it, 0);
+        range.setEndAfter(lastChild);
+        return Math.round(range.getBoundingClientRect().height / lineHeight);
+      } else {
+        return 0;
+      }
+    }
+  }
+});
