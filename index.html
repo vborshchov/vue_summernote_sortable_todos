@@ -11,27 +11,27 @@
 <body>
   <div class="container">
     <div id="todos"><ul class="list-group">
-      <li
-          v-for="thought in thoughts"
-          class="list-group-item thought"
-          data-id="{{$index}}"
-          >
-          <div v-bind:class="{ 'text-primary': thought.done }" class="wrapper">
-              <span v-summernote></span>
-              <span class="glyphicon glyphicon-move"></span>
-              <!-- <span @click="removeThought($index)" class="close">&times;</span> -->
-          </div>
-          <vue-summernote name="html-editor" :model.sync="newThought"></vue-summernote>
-      </li>
+        <li
+            v-for="thought in thoughts"
+            class="list-group-item thought"
+            data-id="{{$index}}"
+            >
+            <div v-bind:class="{ 'text-primary': thought.done }" class="wrapper">
+                <span v-summernote></span>
+                <span class="glyphicon glyphicon-move"></span>
+                <!-- <span @click="removeThought($index)" class="close">&times;</span> -->
+            </div>
+        </li>
       </ul>
+      <vue-summernote name="html-editor" :model.sync="text"></vue-summernote>
 
       <form @submit="addThought">
+        <input v-model="text" class="form-control" type="text" placeholder="">
         <input v-model="newThought" class="form-control" type="text" placeholder="Add some thought">
       </form>
       <pre>{{thoughts | json}}</pre>
       <hr>
-
-
+      {{{text}}}
       <hr>
     </div>
   </div>
@@ -42,6 +42,7 @@
   <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
+  <script src="keyboardJS.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

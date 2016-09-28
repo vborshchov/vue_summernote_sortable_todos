@@ -1,3 +1,30 @@
+'use strict'
+
+// function getSelectionStart() {
+  // var node = document.getSelection().anchorNode;
+  // return (node.nodeType == 3 ? node.parentNode : node);
+// }
+
+// function isMacintosh() {
+//   return navigator.platform.indexOf('Mac') > -1
+// }
+
+// if (isMacintosh()) {
+//   keyboardJS.bind('command + enter', function(e) {
+//     console.log("bind keyboardJS");
+//     vm.splitThought();
+//   });
+// } else {
+//   keyboardJS.bind('ctrl + enter', function(e) {
+//     console.log("bind keyboardJS");
+//     vm.splitThought();
+//   });
+// }
+
+// function splitThought() {
+//   var $current_thought = $(getSelectionStart().closest('li'));
+// }
+
 var VueSummernote = Vue.extend({
   replace: true,
   inherit: false,
@@ -127,11 +154,32 @@ Vue.directive('summernote', {
           // this.innerHTML = scope.thought.title;
           $(this).next().find('.note-editable').html(scope.thought.name);
         },
-        onKeyup: function(e) {
+        onKeydown: function(e) {
           var $it = $(this);
           var $editor = $it.next('.note-editor').find('.note-editable');
-          var lines = $editor.getLines();
+          var lines = $(e.target).getLines();
           console.log(lines);
+          if (lines === 0 && $(scope.thought.name).text().length === 0) {
+            if (e.keyCode === 8) {
+              e.preventDefault();
+              vm.removeThought(scope.$index);
+            } else if (e.keyCode === 46) {
+              vm.removeThought(scope.$index);
+            }
+          }
+        },
+        onKeyup: function(e) {
+          if ((e.keyCode == 10 || e.keyCode == 13) && e.ctrlKey) {
+            vm.splitThought(scope.$index);
+          }
+          // console.log(e.target)
+          // console.log(scope.$forContext.factory)
+          // console.log(vm.$children[scope.$index].$el)
+          // $(vm.$children[scope.$index].$el).summernote('destroy')
+          // console.log(scope.$index)
+          // console.log("prev: "+ vm.thoughts[scope.$index - 1].name)
+          // console.log("next: "+ vm.thoughts[scope.$index + 1].name)
+          // var thought = scope.thought;
         },
         onChange: function(contents, $editable) {
           scope.thought.name = contents;
@@ -157,9 +205,9 @@ var vm = new Vue({
     });
   },
 
-  // components: {
-  //   "vue-summernote": VueSummernote
-  // },
+  components: {
+    "vue-summernote": VueSummernote
+  },
 
   data: {
     thoughts: [
@@ -197,6 +245,17 @@ var vm = new Vue({
 
     removeThought (index) {
       this.thoughts.splice(index, 1);
+    },
+
+    splitThought: function (index) {
+      console.log(index)
+      var name_parts,
+          new_thought = {imageUrl: null, author: null },
+          current_thought = this.thoughts[index];
+
+      name_parts = this.thoughts[index].name.split('<hr>');
+      current_thought.name = name_parts[0];
+      this.thoughts.splice(index+1, 0, { name: name_parts[1], imageUrl: null, author: null });
     }
   }
 });
@@ -220,15 +279,5 @@ $.fn.extend({
         return 0;
       }
     }
-  }
-});
-
-
-// Vue.component('vue-html-editor', VueHtmlEditor);
-
-var vm_bower = new Vue({
-  el: "#app",
-  data: {
-    text: "Hello World!"
   }
 });
