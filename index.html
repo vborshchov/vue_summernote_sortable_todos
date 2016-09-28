@@ -21,6 +21,7 @@
               <span class="glyphicon glyphicon-move"></span>
               <!-- <span @click="removeThought($index)" class="close">&times;</span> -->
           </div>
+          <vue-summernote name="html-editor" :model.sync="newThought"></vue-summernote>
       </li>
       </ul>
 
@@ -28,8 +29,14 @@
         <input v-model="newThought" class="form-control" type="text" placeholder="Add some thought">
       </form>
       <pre>{{thoughts | json}}</pre>
+      <hr>
+
+
+      <hr>
     </div>
   </div>
+
+
   <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.min.js"></script>
   <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
