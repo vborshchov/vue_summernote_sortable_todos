@@ -12,26 +12,25 @@
   <div class="container">
     <div id="todos"><ul class="list-group">
         <li
-            v-for="thought in thoughts"
+            v-for="thought in thoughts | limitBy 3"
             class="list-group-item thought"
             data-id="{{$index}}"
             >
-            <div v-bind:class="{ 'text-primary': thought.done }" class="wrapper">
-                <span v-summernote></span>
+            <div class="wrapper text-center">
+                <img class="img-circle" src="{{thought.imageUrl}}">
+                <vue-summernote name="html-editor" :model.sync="thought.name" ></vue-summernote>
+                <input type="text" v-model="thought.author">
+
+                <div>focused: {{thought.focused}}</div>
                 <span class="glyphicon glyphicon-move"></span>
-                <!-- <span @click="removeThought($index)" class="close">&times;</span> -->
             </div>
         </li>
       </ul>
-      <!-- <vue-summernote name="html-editor" :model.sync="thought"></vue-summernote> -->
 
       <form @submit="addThought">
         <input v-model="newThought" class="form-control" type="text" placeholder="Add some thought">
       </form>
       <pre>{{thoughts | json}}</pre>
-      <hr>
-      {{text}}
-      <hr>
     </div>
   </div>
 

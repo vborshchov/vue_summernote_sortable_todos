@@ -35,9 +35,13 @@ li.thought {
 .glyphicon-move {
   position: absolute;
   top: 40%;
-  right: 0px;
+  right: -3%;
 }
 
 .glyphicon-move:hover {
   cursor: move;
+}
+
+.img-circle {
+    border-radius: 50%;
 }

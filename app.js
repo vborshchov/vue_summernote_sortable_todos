@@ -64,17 +64,29 @@ var VueSummernote = Vue.extend({
       required: false,
       default: true
     },
+    disableDragAndDrop: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
     toolbar: {
       type: Array,
       required: false,
       default: function() {
         return [
-          ["font", ["bold", "italic", "underline", "clear"]],
-          ["fontsize", ["fontsize"]],
-          ["para", ["ul", "ol", "paragraph"]],
-          ["color", ["color"]],
-          ["insert", ["link", "picture", "hr"]]
+          ["font", ["bold", "italic", "underline"]]
         ];
+      }
+    },
+    popover: {
+      type: Object,
+      required: false,
+      default: function() {
+        return {
+          air: [
+                ['style', ['bold', 'italic', 'underline']]
+              ]
+          };
       }
     }
   },
@@ -91,6 +103,7 @@ var VueSummernote = Vue.extend({
       this.maxHeight = this.height;
     }
     var me = this;
+    var scope = this._scope;
     this.control = $(this.$el);
     this.control.summernote({
       lang: this.language,
@@ -99,9 +112,29 @@ var VueSummernote = Vue.extend({
       maxHeight: this.maxHeight,
       airMode: this.airMode,
       toolbar: this.toolbar,
+      popover: this.popover,
       callbacks: {
         onInit: function() {
           me.control.summernote("code", me.model);
+        },
+        onKeydown: function(e) {
+          var $it = $(this);
+          var $editor = $it.next('.note-editor').find('.note-editable');
+          var lines = $(e.target).getLines();
+          console.log(lines);
+        },
+        onKeyup: function(e) {
+          if ((e.keyCode == 10 || e.keyCode == 13) && (event.ctrlKey || event.metaKey)) {
+            vm.splitThought(scope.$index);
+            // console.log($(vm.thoughts[scope.$index+1]).find('.content').summernote('focus'))
+            // $(vm.thoughts[scope.$index+1]['__v-for__1']['node'].nextElementSibling).find('.content').summernote('focus');
+          }
+        },
+        onFocus: function() {
+          vm.thoughts[scope.$index].focused = true;
+        },
+        onBlur: function() {
+          vm.thoughts[scope.$index].focused = false;
         }
       }
     }).on("summernote.change", function() {
@@ -121,8 +154,6 @@ var VueSummernote = Vue.extend({
   },
   watch: {
     "model": function (val, oldVal) {
-      console.log(this.thought);
-      console.log(this.thought.index);
       if (! this.isChanging) {
         this.isChanging = true;
         var code = (val === null ? "" : val);
@@ -162,8 +193,14 @@ Vue.directive('summernote', {
           if (lines === 0 && $(scope.thought.name).text().length === 0) {
             if (e.keyCode === 8) {
               e.preventDefault();
+              if (scope.$index === 0) {
+                $(vm.thoughts[scope.$index]['__v-for__1']['node'].nextElementSibling).find('.content').summernote('focus');
+              } else {
+                $(vm.thoughts[scope.$index]['__v-for__1']['node'].previousElementSibling).find('.note-editable').placeCursorAtEnd();
+              }
               vm.removeThought(scope.$index);
             } else if (e.keyCode === 46) {
+              $(vm.thoughts[scope.$index]['__v-for__1']['node'].nextElementSibling).find('.content').summernote('focus');
               vm.removeThought(scope.$index);
             }
           }
@@ -171,6 +208,7 @@ Vue.directive('summernote', {
         onKeyup: function(e) {
           if ((e.keyCode == 10 || e.keyCode == 13) && e.ctrlKey) {
             vm.splitThought(scope.$index);
+            $(vm.thoughts[scope.$index+1]['__v-for__1']['node'].nextElementSibling).find('.content').summernote('focus');
           }
           // console.log(e.target)
           // console.log(scope.$forContext.factory)
@@ -206,6 +244,7 @@ var vm = new Vue({
     loadJSON(function(response) {
       // Parse JSON string into object
       vm.thoughts = JSON.parse(response);
+      vm.thoughts[0].focused = true;
     });
   },
 
@@ -216,13 +255,14 @@ var vm = new Vue({
   data: {
     thoughts: [],
     newThought: '',
-    text: "Hello world!"
+    text: "Hello world!",
+    order: -1
   },
 
   methods: {
     addThought: function (e) {
       e.preventDefault();
-      this.thoughts.push({ name: this.newThought, imageUrl: null, author: null });
+      this.thoughts.push({ name: this.newThought, imageUrl: null, author: null, focused: false });
       this.newThought = '';
     },
 
@@ -231,16 +271,25 @@ var vm = new Vue({
     },
 
     splitThought: function (index) {
-      console.log(index)
       var name_parts,
           new_thought = {imageUrl: null, author: null },
           current_thought = this.thoughts[index];
 
-      this.removeThought(index);
       name_parts = current_thought.name.split('<hr>');
       current_thought.name = name_parts[0];
-      this.thoughts.splice(index, 0, { name: name_parts[1], imageUrl: null, author: null });
-      this.thoughts.splice(index, 0, { name: name_parts[0], imageUrl: current_thought.imageUrl, author: current_thought.author });
+      current_thought.focused = false;
+      this.thoughts.splice(index+1, 0, { name: name_parts[1], imageUrl: null, author: null, focused: false });
+      this.setFocus(this.thoughts[index + 1], true);
+    },
+
+    setFocus: function (thought, atStart) {
+      console.log(thought['__v-for__1']);
+      atStart = atStart || true;
+      if (atStart) {
+        thought.focused = true;
+      } else {
+
+      }
     }
   }
 });
@@ -264,6 +313,26 @@ $.fn.extend({
         return 0;
       }
     }
+  },
+
+  placeCursorAtEnd: function() {
+      // Places the cursor at the end of a contenteditable container (should also work for textarea / input)
+      if (this.length === 0) {
+          throw new Error("Cannot manipulate an element if there is no element!");
+      }
+      var el = this[0];
+      var range = document.createRange();
+      var sel = window.getSelection();
+      var childLength = el.childNodes.length;
+      if (childLength > 0) {
+          var lastNode = el.childNodes[childLength - 1];
+          var lastNodeChildren = lastNode.childNodes.length;
+          range.setStart(lastNode, lastNodeChildren);
+          range.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(range);
+      }
+      return this;
   }
 });
 
