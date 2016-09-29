@@ -23,15 +23,14 @@
             </div>
         </li>
       </ul>
-      <vue-summernote name="html-editor" :model.sync="text"></vue-summernote>
+      <!-- <vue-summernote name="html-editor" :model.sync="thought"></vue-summernote> -->
 
       <form @submit="addThought">
-        <input v-model="text" class="form-control" type="text" placeholder="">
         <input v-model="newThought" class="form-control" type="text" placeholder="Add some thought">
       </form>
       <pre>{{thoughts | json}}</pre>
       <hr>
-      {{{text}}}
+      {{text}}
       <hr>
     </div>
   </div>

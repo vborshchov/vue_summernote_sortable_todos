@@ -30,7 +30,7 @@ var VueSummernote = Vue.extend({
   inherit: false,
   template: "<textarea class='form-control' :name='name'></textarea>",
   props: {
-    thought: {
+    model: {
       required: true,
       twoWay: true
     },
@@ -203,6 +203,10 @@ var vm = new Vue({
         vm.thoughts.splice(newPosition, 0, vm.thoughts.splice(oldPosition, 1)[0]);
       }
     });
+    loadJSON(function(response) {
+      // Parse JSON string into object
+      vm.thoughts = JSON.parse(response);
+    });
   },
 
   components: {
@@ -210,40 +214,19 @@ var vm = new Vue({
   },
 
   data: {
-    thoughts: [
-      {
-        imageUrl: null,
-        name: 'First thought',
-        author: null
-      },
-      {
-        imageUrl: null,
-        name: '<b>Second</b> thought',
-        author: null
-      },
-      {
-        imageUrl: null,
-        name: 'Third thought',
-        author: null
-      },
-      {
-        imageUrl: null,
-        name: 'Fourth thought',
-        author: null
-      }
-    ],
+    thoughts: [],
     newThought: '',
     text: "Hello world!"
   },
 
   methods: {
-    addThought (e) {
+    addThought: function (e) {
       e.preventDefault();
       this.thoughts.push({ name: this.newThought, imageUrl: null, author: null });
       this.newThought = '';
     },
 
-    removeThought (index) {
+    removeThought: function (index) {
       this.thoughts.splice(index, 1);
     },
 
@@ -253,9 +236,11 @@ var vm = new Vue({
           new_thought = {imageUrl: null, author: null },
           current_thought = this.thoughts[index];
 
-      name_parts = this.thoughts[index].name.split('<hr>');
+      this.removeThought(index);
+      name_parts = current_thought.name.split('<hr>');
       current_thought.name = name_parts[0];
-      this.thoughts.splice(index+1, 0, { name: name_parts[1], imageUrl: null, author: null });
+      this.thoughts.splice(index, 0, { name: name_parts[1], imageUrl: null, author: null });
+      this.thoughts.splice(index, 0, { name: name_parts[0], imageUrl: current_thought.imageUrl, author: current_thought.author });
     }
   }
 });
@@ -281,3 +266,17 @@ $.fn.extend({
     }
   }
 });
+
+function loadJSON(callback) {
+
+  var xobj = new XMLHttpRequest();
+      xobj.overrideMimeType("application/json");
+  xobj.open('GET', 'thoughts.json', true); // Replace 'my_data' with the path to your file
+  xobj.onreadystatechange = function () {
+        if (xobj.readyState == 4 && xobj.status == "200") {
+          // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+          callback(xobj.responseText);
+        }
+  };
+  xobj.send(null);
+}
