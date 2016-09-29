@@ -12,13 +12,13 @@
   <div class="container">
     <div id="todos"><ul class="list-group">
         <li
-            v-for="thought in thoughts | limitBy 3"
+            v-for="thought in thoughts"
             class="list-group-item thought"
             data-id="{{$index}}"
             >
             <div class="wrapper text-center">
-                <img class="img-circle" src="{{thought.imageUrl}}">
-                <vue-summernote name="html-editor" :model.sync="thought.name" ></vue-summernote>
+                <img class="img-circle" :src="thought.imageUrl">
+                <vue-summernote name="html-editor" :content.sync="thought.name" ></vue-summernote>
                 <input type="text" v-model="thought.author">
 
                 <div>focused: {{thought.focused}}</div>

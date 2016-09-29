@@ -30,7 +30,7 @@ var VueSummernote = Vue.extend({
   inherit: false,
   template: "<textarea class='form-control' :name='name'></textarea>",
   props: {
-    model: {
+    content: {
       required: true,
       twoWay: true
     },
@@ -115,26 +115,35 @@ var VueSummernote = Vue.extend({
       popover: this.popover,
       callbacks: {
         onInit: function() {
-          me.control.summernote("code", me.model);
+          me.control.summernote("code", me.content);
         },
         onKeydown: function(e) {
-          var $it = $(this);
-          var $editor = $it.next('.note-editor').find('.note-editable');
-          var lines = $(e.target).getLines();
-          console.log(lines);
         },
         onKeyup: function(e) {
-          if ((e.keyCode == 10 || e.keyCode == 13) && (event.ctrlKey || event.metaKey)) {
+          var $it = $(this);
+          // var $editor = $it.next('.note-editor').find('.note-editable');
+          var lines = $(e.target).getLines();
+          console.log(lines);
+          if (lines === 0 || vm.thoughts[scope.$index].name === "<p><br></p>") {
+            if (e.keyCode == 8) { // if `Backspace` key pressed
+              vm.removeThought(scope.$index);
+              vm.setFocus(scope.$index-1, false);
+            } else if (e.keyCode == 46){ // if `Delete` key pressed
+              vm.removeThought(scope.$index);
+              vm.setFocus(scope.$index+1, true);
+            }
+          }
+          if ((e.keyCode == 10 || e.keyCode == 13) && (e.ctrlKey || e.metaKey)) {
             vm.splitThought(scope.$index);
-            // console.log($(vm.thoughts[scope.$index+1]).find('.content').summernote('focus'))
-            // $(vm.thoughts[scope.$index+1]['__v-for__1']['node'].nextElementSibling).find('.content').summernote('focus');
           }
         },
         onFocus: function() {
-          vm.thoughts[scope.$index].focused = true;
+          if (vm.thoughts[scope.$index] !== undefined)
+            vm.thoughts[scope.$index].focused = true;
         },
         onBlur: function() {
-          vm.thoughts[scope.$index].focused = false;
+          if (vm.thoughts[scope.$index] !== undefined)
+            vm.thoughts[scope.$index].focused = false;
         }
       }
     }).on("summernote.change", function() {
@@ -145,7 +154,7 @@ var VueSummernote = Vue.extend({
       if (! me.isChanging) {
         me.isChanging = true;
         var code = me.control.summernote("code");
-        me.model = (code === null || code.length === 0 ? null : code);
+        me.content = (code === null || code.length === 0 ? null : code);
         me.$nextTick(function () {
           me.isChanging = false;
         });
@@ -153,7 +162,7 @@ var VueSummernote = Vue.extend({
     });
   },
   watch: {
-    "model": function (val, oldVal) {
+    "content": function (val, oldVal) {
       if (! this.isChanging) {
         this.isChanging = true;
         var code = (val === null ? "" : val);
@@ -270,25 +279,37 @@ var vm = new Vue({
       this.thoughts.splice(index, 1);
     },
 
-    splitThought: function (index) {
+    splitThought: function (index, callback) {
       var name_parts,
-          new_thought = {imageUrl: null, author: null },
+          new_thought = {imageUrl: null, author: null, focused: false},
           current_thought = this.thoughts[index];
 
       name_parts = current_thought.name.split('<hr>');
       current_thought.name = name_parts[0];
       current_thought.focused = false;
-      this.thoughts.splice(index+1, 0, { name: name_parts[1], imageUrl: null, author: null, focused: false });
-      this.setFocus(this.thoughts[index + 1], true);
+      new_thought.name = name_parts[1];
+      this.thoughts.splice(index+1, 0, new_thought);
+      this.$nextTick(function() {
+        this.setFocus(index + 1, true);
+      });
     },
 
-    setFocus: function (thought, atStart) {
-      console.log(thought['__v-for__1']);
+    setFocus: function (index, atStart) {
       atStart = atStart || true;
-      if (atStart) {
-        thought.focused = true;
-      } else {
-
+      var length = vm.thoughts.length;
+      if (length > 0) {
+        if (index > length - 1) {
+          index = length - 1
+        } else if (index < 0) {
+          index = 0;
+        }
+        console.log(index, length)
+        if (atStart) {
+          console.log($("[data-id='" + index + "']"));
+          $("[data-id='" + index + "']").find('textarea').summernote('focus')
+        } else {
+          $("[data-id='" + index + "']").find('.note-editable').placeCursorAtEnd();
+        }
       }
     }
   }
