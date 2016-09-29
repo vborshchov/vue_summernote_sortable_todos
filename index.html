@@ -15,6 +15,7 @@
             v-for="thought in thoughts"
             class="list-group-item thought"
             data-id="{{$index}}"
+            transition="thought"
             >
             <div class="wrapper text-center">
                 <img class="img-circle" :src="thought.imageUrl">
@@ -30,7 +31,7 @@
       <form @submit="addThought">
         <input v-model="newThought" class="form-control" type="text" placeholder="Add some thought">
       </form>
-      <pre>{{thoughts | json}}</pre>
+      <!-- <pre>{{thoughts | json}}</pre> -->
     </div>
   </div>
 
@@ -38,9 +39,11 @@
   <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.min.js"></script>
   <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.js"></script>
+  <script src="vue-animated-list.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
-  <script src="keyboardJS.js"></script>
+  <script src="shortcut.js"></script>
+  <script src="utils.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

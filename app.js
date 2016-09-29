@@ -1,29 +1,28 @@
 'use strict'
 
-// function getSelectionStart() {
-  // var node = document.getSelection().anchorNode;
-  // return (node.nodeType == 3 ? node.parentNode : node);
-// }
+function getSelectionStart() {
+  var node = document.getSelection().anchorNode;
+  return (node.nodeType == 3 ? node.parentNode : node);
+}
 
-// function isMacintosh() {
-//   return navigator.platform.indexOf('Mac') > -1
-// }
+function isMacintosh() {
+  return navigator.platform.indexOf('Mac') > -1
+}
 
-// if (isMacintosh()) {
-//   keyboardJS.bind('command + enter', function(e) {
-//     console.log("bind keyboardJS");
-//     vm.splitThought();
-//   });
-// } else {
-//   keyboardJS.bind('ctrl + enter', function(e) {
-//     console.log("bind keyboardJS");
-//     vm.splitThought();
-//   });
-// }
+if (isMacintosh()) {
+  shortcut.add("Command+Enter",function() {
+    splitThought();
+  });
+} else {
+  shortcut.add("Ctrl+Enter",function() {
+    splitThought();
+  });
+}
 
-// function splitThought() {
-//   var $current_thought = $(getSelectionStart().closest('li'));
-// }
+function splitThought() {
+  var id = $(getSelectionStart().closest('li')).data('id');
+  vm.splitThought(id)
+}
 
 var VueSummernote = Vue.extend({
   replace: true,
@@ -121,7 +120,6 @@ var VueSummernote = Vue.extend({
         },
         onKeyup: function(e) {
           var $it = $(this);
-          // var $editor = $it.next('.note-editor').find('.note-editable');
           var lines = $(e.target).getLines();
           console.log(lines);
           if (lines === 0 || vm.thoughts[scope.$index].name === "<p><br></p>") {
@@ -132,9 +130,6 @@ var VueSummernote = Vue.extend({
               vm.removeThought(scope.$index);
               vm.setFocus(scope.$index+1, true);
             }
-          }
-          if ((e.keyCode == 10 || e.keyCode == 13) && (e.ctrlKey || e.metaKey)) {
-            vm.splitThought(scope.$index);
           }
         },
         onFocus: function() {
@@ -175,7 +170,6 @@ var VueSummernote = Vue.extend({
 
 Vue.component('vue-summernote', VueSummernote);
 
-
 Vue.directive('summernote', {
   terminal: true,
   bind: function() {
@@ -191,8 +185,6 @@ Vue.directive('summernote', {
       },
       callbacks: {
         onInit: function() {
-          // this.innerHTML = scope.thought.title;
-          $(this).next().find('.note-editable').html(scope.thought.name);
         },
         onKeydown: function(e) {
           var $it = $(this);
@@ -215,18 +207,6 @@ Vue.directive('summernote', {
           }
         },
         onKeyup: function(e) {
-          if ((e.keyCode == 10 || e.keyCode == 13) && e.ctrlKey) {
-            vm.splitThought(scope.$index);
-            $(vm.thoughts[scope.$index+1]['__v-for__1']['node'].nextElementSibling).find('.content').summernote('focus');
-          }
-          // console.log(e.target)
-          // console.log(scope.$forContext.factory)
-          // console.log(vm.$children[scope.$index].$el)
-          // $(vm.$children[scope.$index].$el).summernote('destroy')
-          // console.log(scope.$index)
-          // console.log("prev: "+ vm.thoughts[scope.$index - 1].name)
-          // console.log("next: "+ vm.thoughts[scope.$index + 1].name)
-          // var thought = scope.thought;
         },
         onChange: function(contents, $editable) {
           scope.thought.name = contents;
@@ -279,7 +259,7 @@ var vm = new Vue({
       this.thoughts.splice(index, 1);
     },
 
-    splitThought: function (index, callback) {
+    splitThought: function (index) {
       var name_parts,
           new_thought = {imageUrl: null, author: null, focused: false},
           current_thought = this.thoughts[index];
@@ -303,9 +283,7 @@ var vm = new Vue({
         } else if (index < 0) {
           index = 0;
         }
-        console.log(index, length)
         if (atStart) {
-          console.log($("[data-id='" + index + "']"));
           $("[data-id='" + index + "']").find('textarea').summernote('focus')
         } else {
           $("[data-id='" + index + "']").find('.note-editable').placeCursorAtEnd();
@@ -316,57 +294,3 @@ var vm = new Vue({
 });
 
 Vue.config.debug = true;
-
-$.fn.extend({
-  getLines: function() {
-    var it = this[0];
-    var lastChild = it.lastChild;
-    var range = document.createRange();
-    var lineHeight = parseInt(this.css('line-height'));
-    if (isNaN(lineHeight)) {
-      return 0;
-    } else {
-      if (lastChild) {
-        range.setStart(it, 0);
-        range.setEndAfter(lastChild);
-        return Math.round(range.getBoundingClientRect().height / lineHeight);
-      } else {
-        return 0;
-      }
-    }
-  },
-
-  placeCursorAtEnd: function() {
-      // Places the cursor at the end of a contenteditable container (should also work for textarea / input)
-      if (this.length === 0) {
-          throw new Error("Cannot manipulate an element if there is no element!");
-      }
-      var el = this[0];
-      var range = document.createRange();
-      var sel = window.getSelection();
-      var childLength = el.childNodes.length;
-      if (childLength > 0) {
-          var lastNode = el.childNodes[childLength - 1];
-          var lastNodeChildren = lastNode.childNodes.length;
-          range.setStart(lastNode, lastNodeChildren);
-          range.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(range);
-      }
-      return this;
-  }
-});
-
-function loadJSON(callback) {
-
-  var xobj = new XMLHttpRequest();
-      xobj.overrideMimeType("application/json");
-  xobj.open('GET', 'thoughts.json', true); // Replace 'my_data' with the path to your file
-  xobj.onreadystatechange = function () {
-        if (xobj.readyState == 4 && xobj.status == "200") {
-          // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-          callback(xobj.responseText);
-        }
-  };
-  xobj.send(null);
-}
