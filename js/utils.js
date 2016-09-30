@@ -29,7 +29,11 @@ $.fn.extend({
       if (childLength > 0) {
           var lastNode = el.childNodes[childLength - 1];
           var lastNodeChildren = lastNode.childNodes.length;
-          range.setStart(lastNode, lastNodeChildren);
+          if (lastNode.nodeType === 3) {
+            range.setStart(lastNode, lastNode.length);
+          } else {
+            range.setStart(lastNode, lastNodeChildren);
+          }
           range.collapse(true);
           sel.removeAllRanges();
           sel.addRange(range);
@@ -42,7 +46,7 @@ function loadJSON(callback) {
 
   var xobj = new XMLHttpRequest();
       xobj.overrideMimeType("application/json");
-  xobj.open('GET', 'thoughts.json', true); // Replace 'my_data' with the path to your file
+  xobj.open('GET', 'thoughts-small-list.json', true); // Replace 'my_data' with the path to your file
   xobj.onreadystatechange = function () {
         if (xobj.readyState == 4 && xobj.status == "200") {
           // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode

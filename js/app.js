@@ -21,7 +21,7 @@ if (isMacintosh()) {
 
 function splitThought() {
   var id = $(getSelectionStart().closest('li')).data('id');
-  vm.splitThought(id)
+  vm.splitThought(id);
 }
 
 var VueSummernote = Vue.extend({
@@ -124,8 +124,8 @@ var VueSummernote = Vue.extend({
           console.log(lines);
           if (lines === 0 || vm.thoughts[scope.$index].name === "<p><br></p>") {
             if (e.keyCode == 8) { // if `Backspace` key pressed
+              vm.setFocus(scope.$index-1);
               vm.removeThought(scope.$index);
-              vm.setFocus(scope.$index-1, false);
             } else if (e.keyCode == 46){ // if `Delete` key pressed
               vm.removeThought(scope.$index);
               vm.setFocus(scope.$index+1, true);
@@ -169,52 +169,6 @@ var VueSummernote = Vue.extend({
 });
 
 Vue.component('vue-summernote', VueSummernote);
-
-Vue.directive('summernote', {
-  terminal: true,
-  bind: function() {
-    var scope = this._scope;
-    var it = this;
-    this.editor = $(this.el).summernote({
-      airMode: true,
-      disableDragAndDrop: true,
-      popover: {
-        air: [
-          ['style', ['bold', 'italic', 'underline', 'clear']]
-        ]
-      },
-      callbacks: {
-        onInit: function() {
-        },
-        onKeydown: function(e) {
-          var $it = $(this);
-          var $editor = $it.next('.note-editor').find('.note-editable');
-          var lines = $(e.target).getLines();
-          console.log(lines);
-          if (lines === 0 && $(scope.thought.name).text().length === 0) {
-            if (e.keyCode === 8) {
-              e.preventDefault();
-              if (scope.$index === 0) {
-                $(vm.thoughts[scope.$index]['__v-for__1']['node'].nextElementSibling).find('.content').summernote('focus');
-              } else {
-                $(vm.thoughts[scope.$index]['__v-for__1']['node'].previousElementSibling).find('.note-editable').placeCursorAtEnd();
-              }
-              vm.removeThought(scope.$index);
-            } else if (e.keyCode === 46) {
-              $(vm.thoughts[scope.$index]['__v-for__1']['node'].nextElementSibling).find('.content').summernote('focus');
-              vm.removeThought(scope.$index);
-            }
-          }
-        },
-        onKeyup: function(e) {
-        },
-        onChange: function(contents, $editable) {
-          scope.thought.name = contents;
-        }
-      }
-    });
-  }
-});
 
 var vm = new Vue({
   el: '#todos',
@@ -275,13 +229,14 @@ var vm = new Vue({
     },
 
     setFocus: function (index, atStart) {
-      atStart = atStart || true;
+      // atStart = atStart || true;
       var length = vm.thoughts.length;
       if (length > 0) {
         if (index > length - 1) {
           index = length - 1
         } else if (index < 0) {
-          index = 0;
+          index = 1;
+          atStart = true;
         }
         if (atStart) {
           $("[data-id='" + index + "']").find('textarea').summernote('focus')
