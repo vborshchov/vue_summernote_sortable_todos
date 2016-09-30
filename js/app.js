@@ -232,8 +232,8 @@ var vm = new Vue({
       // atStart = atStart || true;
       var length = vm.thoughts.length;
       if (length > 0) {
-        if (index > length - 1) {
-          index = length - 2;
+        if (index > length) {
+          index = length - 1;
         } else if (index < 0) {
           index = 1;
           atStart = true;
