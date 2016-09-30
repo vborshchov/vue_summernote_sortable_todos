@@ -10,28 +10,39 @@
 </head>
 <body>
   <div class="container">
-    <div id="todos"><ul class="list-group">
+    <div id="todos"><ul class="headlines-list">
         <li
-            v-for="thought in thoughts"
-            class="list-group-item thought"
-            data-id="{{$index}}"
-            transition="thought"
-            >
-            <div class="wrapper text-center">
-                <img class="img-circle" :src="thought.imageUrl">
-                <vue-summernote name="html-editor" :content.sync="thought.name" ></vue-summernote>
-                <input type="text" v-model="thought.author">
-
-                <div>focused: {{thought.focused}}</div>
-                <span class="glyphicon glyphicon-move"></span>
-            </div>
+          v-for="headline in headlines"
+          >
+          <input type="text" v-model="headline.name" class="headline-name">
+          <span class="glyphicon glyphicon-move"></span>
+          <p>
+            <small>{{headline._id}}</small>
+            <small>{{headline.created_at}}</small>
+          </p>
+          <ul class="list-group thoughts-list">
+            <li
+                v-for="thought in headline.thoughts"
+                track-by="_id"
+                class="list-group-item thought"
+                data-thought-id="{{$index}}"
+                >
+                <div class="wrapper text-center">
+                    {{$parent.$index}}
+                    <img class="img-circle" :src="thought.picture">
+                    <vue-summernote name="html-editor" :content.sync="thought.name" ></vue-summernote>
+                    <input type="text" v-model="thought.author">
+                    <span class="glyphicon glyphicon-move"></span>
+                </div>
+            </li>
+          </ul>
         </li>
       </ul>
 
       <form @submit="addThought">
         <input v-model="newThought" class="form-control" type="text" placeholder="Add some thought">
       </form>
-      <pre>{{thoughts | json}}</pre>
+      <pre>{{headlines | json}}</pre>
     </div>
   </div>
 

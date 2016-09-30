@@ -5,10 +5,12 @@
   position: relative;
 }
 
-li.thought {
+.thought {
   width: 50%;
   margin: 10px auto;
   position: relative;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .close {
@@ -28,10 +30,14 @@ li.thought {
   margin: 0 auto;
 }
 
-.glyphicon-move {
+.thoughts-list .glyphicon-move {
   position: absolute;
   top: 40%;
   right: -3%;
+}
+
+.headline-name {
+  width: 90%;
 }
 
 .glyphicon-move:hover {

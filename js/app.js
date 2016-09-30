@@ -10,7 +10,7 @@ function isMacintosh() {
 }
 
 if (isMacintosh()) {
-  shortcut.add("Command+Enter",function() {
+  shortcut.add("Meta+Enter",function() {
     splitThought();
   });
 } else {
@@ -20,8 +20,8 @@ if (isMacintosh()) {
 }
 
 function splitThought() {
-  var id = $(getSelectionStart().closest('li')).data('id');
-  vm.splitThought(id);
+  // var thought_id = $(getSelectionStart().closest('li')).data('id');
+  vm.splitThought(vm.focus_coordinates.headline_id, vm.focus_coordinates.thought_id);
 }
 
 var VueSummernote = Vue.extend({
@@ -122,23 +122,34 @@ var VueSummernote = Vue.extend({
           var $it = $(this);
           var lines = $(e.target).getLines();
           console.log(lines);
-          if (lines === 0 || vm.thoughts[scope.$index].name === "<p><br></p>") {
+          if (lines === 0 || vm.headlines[scope.$parent.$index].thoughts[scope.$index].name === "<p><br></p>" || vm.headlines[scope.$parent.$index].thoughts[scope.$index].name === "<br>") {
             if (e.keyCode == 8) { // if `Backspace` key pressed
-              vm.setFocus(scope.$index-1);
-              vm.removeThought(scope.$index);
+              vm.setFocus(scope.$parent.$index, scope.$index-1);
+              vm.removeThought(scope.$parent.$index, scope.$index);
             } else if (e.keyCode == 46){ // if `Delete` key pressed
-              vm.setFocus(scope.$index + 1, true);
-              vm.removeThought(scope.$index);
+              vm.setFocus(scope.$parent.$index, scope.$index + 1, true);
+              vm.removeThought(scope.$parent.$index, scope.$index);
             }
           }
         },
         onFocus: function() {
-          if (vm.thoughts[scope.$index] !== undefined)
-            vm.thoughts[scope.$index].focused = true;
+          vm.focus_coordinates = {
+            "headline_id": scope.$parent.$index,
+            "thought_id": scope.$index
+          }
         },
         onBlur: function() {
-          if (vm.thoughts[scope.$index] !== undefined)
-            vm.thoughts[scope.$index].focused = false;
+          vm.focus_coordinates = {};
+        },
+        onPaste: function (e) {
+          var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+          var bufferTextWithHashtags = highlightHashTags(bufferText);
+          e.preventDefault();
+          if (bufferText.length === bufferTextWithHashtags.length) {
+            document.execCommand('insertHTML', false, bufferText);
+          } else {
+            document.execCommand('insertHTML', false, bufferTextWithHashtags);
+          }
         }
       }
     }).on("summernote.change", function() {
@@ -174,21 +185,20 @@ var vm = new Vue({
   el: '#todos',
 
   ready: function (value) {
+    loadJSON(function(response) {
+      // Parse JSON string into object
+      vm.headlines = JSON.parse(response);
+    });
+    console.log(this.$el.firstChild);
     Sortable.create(this.$el.firstChild, {
       handle: ".glyphicon-move",
       draggable: 'li',
       animation: 500,
       onUpdate: function(e) {
-        var oldPosition = e.item.getAttribute('data-id');
-        var newPosition = this.toArray().indexOf(oldPosition);
-        vm.thoughts.splice(newPosition, 0, vm.thoughts.splice(oldPosition, 1)[0]);
+        vm.headlines.splice(e.newIndex, 0, vm.headlines.splice(e.oldIndex, 1)[0]);
       }
     });
-    loadJSON(function(response) {
-      // Parse JSON string into object
-      vm.thoughts = JSON.parse(response);
-      vm.thoughts[0].focused = true;
-    });
+
   },
 
   components: {
@@ -196,10 +206,9 @@ var vm = new Vue({
   },
 
   data: {
-    thoughts: [],
-    newThought: '',
-    text: "Hello world!",
-    order: -1
+    headlines: [],
+    focus_coordinates: {},
+    newThought: ''
   },
 
   methods: {
@@ -209,43 +218,53 @@ var vm = new Vue({
       this.newThought = '';
     },
 
-    removeThought: function (index) {
-      this.thoughts.splice(index, 1);
+    removeThought: function (headline_index, thought_index) {
+      this.headlines[headline_index].thoughts.splice(thought_index, 1);
     },
 
-    splitThought: function (index) {
+    splitThought: function (headline_index, thought_index) {
       var name_parts,
           new_thought = {imageUrl: null, author: null, focused: false},
-          current_thought = this.thoughts[index];
+          current_thought = this.headlines[headline_index].thoughts[thought_index];
 
       name_parts = current_thought.name.split('<hr>');
       current_thought.name = name_parts[0];
       current_thought.focused = false;
       new_thought.name = name_parts[1];
-      this.thoughts.splice(index+1, 0, new_thought);
+      this.headlines[headline_index].thoughts.splice(thought_index + 1, 0, new_thought);
       this.$nextTick(function() {
-        this.setFocus(index + 1, true);
+        this.setFocus(headline_index, thought_index + 1, true);
       });
     },
 
-    setFocus: function (index, atStart) {
+    setFocus: function (headline_index, thought_index, atStart) {
       // atStart = atStart || true;
-      var length = vm.thoughts.length;
+      var length = vm.headlines[headline_index].thoughts.length;
       if (length > 0) {
-        if (index > length) {
-          index = length - 1;
-        } else if (index < 0) {
-          index = 1;
+        if (thought_index > length) {
+          thought_index = length - 1;
+        } else if (thought_index < 0) {
+          thought_index = 1;
           atStart = true;
         }
         if (atStart) {
-          $("[data-id='" + index + "']").find('textarea').summernote('focus');
+          $(".headlines-list > li").eq(headline_index).find("[data-thought-id='" + thought_index + "'] textarea").summernote('focus');
         } else {
-          $("[data-id='" + index + "']").find('.note-editable').placeCursorAtEnd();
+          $(".headlines-list > li").eq(headline_index).find("[data-thought-id='" + thought_index + "'] .note-editable").placeCursorAtEnd();
         }
       }
     }
   }
 });
+
+// Sortable.create($('.thoughts-list')[0], {
+//   handle: ".glyphicon-move",
+//   group: "thoughts",
+//   draggable: 'li',
+//   animation: 500,
+//   onUpdate: function(e) {
+//     vm.headlines.splice(e.newIndex, 0, vm.headlines.splice(e.oldIndex, 1)[0]);
+//   }
+// });
 
 Vue.config.debug = true;
