@@ -231,6 +231,7 @@ var vm = new Vue({
       current_thought.name = name_parts[0];
       current_thought.focused = false;
       new_thought.name = name_parts[1];
+      new_thought._id = GUID();
       this.headlines[headline_index].thoughts.splice(thought_index + 1, 0, new_thought);
       this.$nextTick(function() {
         this.setFocus(headline_index, thought_index + 1, true);
