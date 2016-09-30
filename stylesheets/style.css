@@ -24,10 +24,6 @@ li.thought {
   width: 95%;
 }
 
-.note-editable {
-  border: 1px solid red;
-}
-
 .note-editable p {
   margin: 0 auto;
 }
