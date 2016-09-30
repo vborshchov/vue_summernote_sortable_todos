@@ -127,8 +127,8 @@ var VueSummernote = Vue.extend({
               vm.setFocus(scope.$index-1);
               vm.removeThought(scope.$index);
             } else if (e.keyCode == 46){ // if `Delete` key pressed
+              vm.setFocus(scope.$index + 1, true);
               vm.removeThought(scope.$index);
-              vm.setFocus(scope.$index+1, true);
             }
           }
         },
@@ -233,13 +233,13 @@ var vm = new Vue({
       var length = vm.thoughts.length;
       if (length > 0) {
         if (index > length - 1) {
-          index = length - 1
+          index = length - 2;
         } else if (index < 0) {
           index = 1;
           atStart = true;
         }
         if (atStart) {
-          $("[data-id='" + index + "']").find('textarea').summernote('focus')
+          $("[data-id='" + index + "']").find('textarea').summernote('focus');
         } else {
           $("[data-id='" + index + "']").find('.note-editable').placeCursorAtEnd();
         }
