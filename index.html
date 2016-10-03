@@ -21,7 +21,8 @@
             <small>{{headline._id}}</small>
             <small>{{headline.created_at}}</small>
           </p>
-          <ul class="list-group thoughts-list">
+          <thoughts-list :list="headline.thoughts" :index="$index"></thoughts-list>
+          <!-- <ul class="list-group thoughts-list">
             <li
                 v-for="thought in headline.thoughts"
                 track-by="_id"
@@ -36,7 +37,7 @@
                     <span class="glyphicon glyphicon-move"></span>
                 </div>
             </li>
-          </ul>
+          </ul> -->
         </li>
       </ul>
 
@@ -47,6 +48,28 @@
     </div>
   </div>
 
+  <template id="thoughts-list-template">
+    <ul
+      class="list-group thoughts-list"
+      data-headline-id="{{index}}"
+      >
+      <li
+          v-for="thought in list"
+          track-by="_id"
+          class="list-group-item thought"
+          data-headline-id="{{index}}"
+          data-thought-id="{{$index}}"
+          >
+          {{index}}
+          <div class="wrapper text-center">
+              <img class="img-circle" :src="thought.picture">
+              <vue-summernote name="html-editor" :content.sync="thought.name" ></vue-summernote>
+              <input type="text" v-model="thought.author">
+              <span class="glyphicon glyphicon-move"></span>
+          </div>
+      </li>
+    </ul>
+  </template>
 
   <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
   <script src="js/utils.js"></script>

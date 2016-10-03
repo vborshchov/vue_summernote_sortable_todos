@@ -122,13 +122,13 @@ var VueSummernote = Vue.extend({
           var $it = $(this);
           var lines = $(e.target).getLines();
           console.log(lines);
-          if (lines === 0 || vm.headlines[scope.$parent.$index].thoughts[scope.$index].name === "<p><br></p>" || vm.headlines[scope.$parent.$index].thoughts[scope.$index].name === "<br>") {
+          if (lines === 0 || vm.headlines[scope.$parent.index].thoughts[scope.$index].name === "<p><br></p>" || vm.headlines[scope.$parent.$index].thoughts[scope.$index].name === "<br>") {
             if (e.keyCode == 8) { // if `Backspace` key pressed
-              vm.setFocus(scope.$parent.$index, scope.$index-1);
-              vm.removeThought(scope.$parent.$index, scope.$index);
+              vm.setFocus(scope.$parent.index, scope.$index-1);
+              vm.removeThought(scope.$parent.index, scope.$index);
             } else if (e.keyCode == 46){ // if `Delete` key pressed
-              vm.setFocus(scope.$parent.$index, scope.$index + 1, true);
-              vm.removeThought(scope.$parent.$index, scope.$index);
+              vm.setFocus(scope.$parent.index, scope.$index + 1, true);
+              vm.removeThought(scope.$parent.index, scope.$index);
             }
           }
         },
@@ -181,6 +181,64 @@ var VueSummernote = Vue.extend({
 
 Vue.component('vue-summernote', VueSummernote);
 
+var ThoughtsList = Vue.extend({
+  template: "#thoughts-list-template",
+  props: {
+    // basic type check (`null` means accept any type)
+    index: Number,
+    // object/array defaults should be returned from a
+    // factory function
+    list: {
+      type: Array,
+      default: function () {
+        return   [{
+                    "imageUrl": null,
+                    "name": "<p><br></p>",
+                    "author": null,
+                    "focused": false
+                  }]
+      }
+    }
+  },
+  beforeCompile: function() {
+    // console.log(this)
+  },
+  ready: function() {
+    // console.log(this.$el);
+    // console.log(this._scope);
+    Sortable.create($(this.$el)[0], {
+      handle: ".glyphicon-move",
+      group: "thoughts",
+      draggable: 'li',
+      animation: 500,
+      onUpdate: function(e) {
+        console.log(e.oldIndex, e.newIndex);
+        vm.headlines[$(this.el).data("headline-id")].thoughts.splice(e.newIndex, 0, vm.headlines[$(this.el).data("headline-id")].thoughts.splice(e.oldIndex, 1)[0]);
+      },
+      onAdd: function (e) {
+        var oldThoughtId = e.oldIndex; // if of dragged HTMLElement
+        var oldHeadlineId = $(e.from).data("headline-id");
+        var newThoughtId = e.newIndex;// id of HTMLElement on which have guided
+        var newHeadlineId = $(e.item).closest('ul').data('headline-id');
+
+        console.log($(e.item).closest('ul').data('headline-id'), e.newIndex);
+        console.log($(e.from).data("headline-id"), e.oldIndex);
+        console.log(oldThoughtId);
+        console.log(oldHeadlineId);
+        console.log(newThoughtId);
+        console.log(newHeadlineId);
+        // extract thought from old list in variable
+        var thought = vm.headlines[oldHeadlineId].thoughts[oldThoughtId]
+        vm.headlines[oldHeadlineId].thoughts.splice(oldThoughtId, 1);
+        vm.headlines[newHeadlineId].thoughts.splice(newThoughtId, 0, thought)
+        console.log(thought);
+      }
+    });
+  }
+});
+
+Vue.component('thoughts-list', ThoughtsList);
+
 var vm = new Vue({
   el: '#todos',
 
@@ -202,7 +260,8 @@ var vm = new Vue({
   },
 
   components: {
-    "vue-summernote": VueSummernote
+    "vue-summernote": VueSummernote,
+    "thoughts-list": ThoughtsList
   },
 
   data: {
