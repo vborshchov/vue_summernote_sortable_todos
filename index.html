@@ -22,22 +22,6 @@
             <small>{{headline.created_at}}</small>
           </p>
           <thoughts-list :list="headline.thoughts" :index="$index"></thoughts-list>
-          <!-- <ul class="list-group thoughts-list">
-            <li
-                v-for="thought in headline.thoughts"
-                track-by="_id"
-                class="list-group-item thought"
-                data-thought-id="{{$index}}"
-                >
-                <div class="wrapper text-center">
-                    {{$parent.$index}}
-                    <img class="img-circle" :src="thought.picture">
-                    <vue-summernote name="html-editor" :content.sync="thought.name" ></vue-summernote>
-                    <input type="text" v-model="thought.author">
-                    <span class="glyphicon glyphicon-move"></span>
-                </div>
-            </li>
-          </ul> -->
         </li>
       </ul>
 

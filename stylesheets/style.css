@@ -30,6 +30,10 @@
   margin: 0 auto;
 }
 
+.thoughts-list {
+  min-height: 20px;
+}
+
 .thoughts-list .glyphicon-move {
   position: absolute;
   top: 40%;
