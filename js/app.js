@@ -200,6 +200,28 @@ var ThoughtsList = Vue.extend({
       }
     }
   },
+  methods: {
+    makeHeadline: function (headlineId, thoughtId) {
+      console.log(headlineId, thoughtId);
+      console.log(vm.headlines[headlineId].thoughts[thoughtId]);
+      // extract thought from old headlines list in variable
+      var thought = vm.headlines[headlineId].thoughts[thoughtId]
+      var upperThoughts = vm.headlines[headlineId].thoughts.slice(0, thoughtId);
+      var lowerThoughts = vm.headlines[headlineId].thoughts.slice(thoughtId, vm.headlines[headlineId].thoughts.length);
+      vm.headlines[headlineId].thoughts = upperThoughts;
+      var newHeadline = {
+        "_id": GUID(),
+        "name": lowerThoughts[0].name.substring(0, 70),
+        "created_at": (function () {
+                  var now = new Date(); // Fri Feb 20 2015 19:29:31 GMT+0530 (India Standard Time)
+                  var isoDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+                  return isoDate;
+                })(),
+        "thoughts": lowerThoughts.slice(1, lowerThoughts.length)
+      }
+      vm.headlines.splice(headlineId + 1, 0, newHeadline)
+    }
+  },
   beforeCompile: function() {
     // console.log(this)
   },

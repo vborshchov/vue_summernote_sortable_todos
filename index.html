@@ -51,6 +51,9 @@
               <input type="text" v-model="thought.author">
               <span class="glyphicon glyphicon-move"></span>
           </div>
+          <div class="btn btn-default headline-button" title="make headline" v-on:click="makeHeadline(index, $index)">
+            <i class="fa fa-align-center headline-icon" aria-hidden="true"></i>
+          </div>
       </li>
     </ul>
   </template>
