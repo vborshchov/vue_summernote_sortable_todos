@@ -203,7 +203,6 @@ var ThoughtsList = Vue.extend({
   },
   methods: {
     makeHeadline: function (headlineId, thoughtId) {
-      console.log(headlineId, thoughtId);
       // extract thought from old headlines list in variable
       var thought = vm.headlines[headlineId].thoughts[thoughtId]
       var upperThoughts = vm.headlines[headlineId].thoughts.slice(0, thoughtId);
@@ -283,15 +282,15 @@ var vm = new Vue({
     focus_coordinates: {}
   },
 
-  watch: {
-    'headlines': {
-      handler: function (val, oldVal) {
-        console.log('new: %s, old: %s', val, oldVal);
-        console.log('a thing changed');
-      },
-      deep: true
-    }
-  },
+  // watch: {
+  //   'headlines': {
+  //     handler: function (val, oldVal) {
+  //       console.log('new: %s, old: %s', val, oldVal);
+  //       console.log('a thing changed');
+  //     },
+  //     deep: true
+  //   }
+  // },
 
   methods: {
     addThought: function (e) {
@@ -335,6 +334,12 @@ var vm = new Vue({
         } else {
           $(".headlines-list > li").eq(headline_index).find("[data-thought-id='" + thought_index + "'] .note-editable").placeCursorAtEnd();
         }
+      }
+    },
+
+    deleteHeadline: function(index) {
+      if (confirm("Are you sure to delete this headline?\nAll thoughts will be deleted too.")) {
+        this.headlines.splice(index, 1)
       }
     }
   }

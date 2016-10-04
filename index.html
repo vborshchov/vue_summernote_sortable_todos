@@ -35,6 +35,7 @@
               type="text"
               v-model="headline.name"
               @keyup.enter="addThought"
+              @keydown="headline.name.length === 0 ? deleteHeadline($index) : null"
               class="headline-name"
               >
             <span class="glyphicon glyphicon-move"></span>
