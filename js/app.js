@@ -203,7 +203,6 @@ var ThoughtsList = Vue.extend({
   methods: {
     makeHeadline: function (headlineId, thoughtId) {
       console.log(headlineId, thoughtId);
-      console.log(vm.headlines[headlineId].thoughts[thoughtId]);
       // extract thought from old headlines list in variable
       var thought = vm.headlines[headlineId].thoughts[thoughtId]
       var upperThoughts = vm.headlines[headlineId].thoughts.slice(0, thoughtId);
@@ -211,15 +210,15 @@ var ThoughtsList = Vue.extend({
       vm.headlines[headlineId].thoughts = upperThoughts;
       var newHeadline = {
         "_id": GUID(),
-        "name": lowerThoughts[0].name.substring(0, 70),
+        "name": extractContent(lowerThoughts[0].name).substring(0, 70),
         "created_at": (function () {
-                  var now = new Date(); // Fri Feb 20 2015 19:29:31 GMT+0530 (India Standard Time)
+                  var now = new Date();
                   var isoDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
                   return isoDate;
                 })(),
         "thoughts": lowerThoughts.slice(1, lowerThoughts.length)
-      }
-      vm.headlines.splice(headlineId + 1, 0, newHeadline)
+      };
+      vm.headlines.splice(headlineId + 1, 0, newHeadline);
     }
   },
   beforeCompile: function() {
@@ -281,15 +280,26 @@ var vm = new Vue({
 
   data: {
     headlines: [],
-    focus_coordinates: {},
-    newThought: ''
+    focus_coordinates: {}
+  },
+
+  watch: {
+    'headlines': {
+      handler: function (val, oldVal) {
+        console.log('new: %s, old: %s', val, oldVal);
+        console.log('a thing changed');
+      },
+      deep: true
+    }
   },
 
   methods: {
     addThought: function (e) {
-      e.preventDefault();
-      this.thoughts.push({ name: this.newThought, imageUrl: null, author: null, focused: false });
-      this.newThought = '';
+      var index = e.target.__v_model._scope.$index;
+      vm.headlines[index].thoughts.unshift(new Thought());
+      this.$nextTick(function() {
+        this.setFocus(index, 0);
+      });
     },
 
     removeThought: function (headline_index, thought_index) {
@@ -331,15 +341,5 @@ var vm = new Vue({
     }
   }
 });
-
-// Sortable.create($('.thoughts-list')[0], {
-//   handle: ".glyphicon-move",
-//   group: "thoughts",
-//   draggable: 'li',
-//   animation: 500,
-//   onUpdate: function(e) {
-//     vm.headlines.splice(e.newIndex, 0, vm.headlines.splice(e.oldIndex, 1)[0]);
-//   }
-// });
 
 Vue.config.debug = true;

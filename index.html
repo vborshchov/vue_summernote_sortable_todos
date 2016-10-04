@@ -15,7 +15,11 @@
           v-for="headline in headlines"
           track-by="_id"
           >
-          <input type="text" v-model="headline.name" class="headline-name">
+          <input
+            type="text"
+            v-model="headline.name"
+            @keyup.enter="addThought"
+            class="headline-name">
           <span class="glyphicon glyphicon-move"></span>
           <p>
             <small>{{headline._id}}</small>
@@ -25,9 +29,9 @@
         </li>
       </ul>
 
-      <form @submit="addThought">
-        <input v-model="newThought" class="form-control" type="text" placeholder="Add some thought">
-      </form>
+<!--       <form @submit="addThought">
+        <input v-model="newThought.name" class="form-control" type="text" placeholder="Add some thought">
+      </form> -->
       <pre>{{headlines | json}}</pre>
     </div>
   </div>
@@ -67,6 +71,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
   <script src="lib/GUID.min.js"></script>
   <script src="lib/shortcut.js"></script>
+  <script src="js/thought.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
