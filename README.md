@@ -2,6 +2,7 @@
 Todos list with rich text editing and DnD sorting
 
 [Demo](https://codepen.io/vborshchov/full/NRvLqo/)
+
 Use ctrl+enter to split todo
 To add new todo:
   *  press enter in headline to add new todo
