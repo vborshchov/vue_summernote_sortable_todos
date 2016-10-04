@@ -313,7 +313,7 @@ var vm = new Vue({
       name_parts = current_thought.name.split('<hr>');
       current_thought.name = name_parts[0];
       current_thought.focused = false;
-      new_thought = new Thought(null, name_parts[1]),
+      new_thought = new Thought(null, extractContent(name_parts[1])),
       this.headlines[headline_index].thoughts.splice(thought_index + 1, 0, new_thought);
       this.$nextTick(function() {
         this.setFocus(headline_index, thought_index + 1, true);
