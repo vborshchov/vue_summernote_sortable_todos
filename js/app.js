@@ -111,6 +111,7 @@ var VueSummernote = Vue.extend({
       maxHeight: this.maxHeight,
       airMode: this.airMode,
       toolbar: this.toolbar,
+      disableDragAndDrop: this.disableDragAndDrop,
       popover: this.popover,
       callbacks: {
         onInit: function() {
@@ -189,15 +190,15 @@ var ThoughtsList = Vue.extend({
     // object/array defaults should be returned from a
     // factory function
     list: {
-      type: Array,
-      default: function () {
-        return   [{
-                    "imageUrl": null,
-                    "name": "<p><br></p>",
-                    "author": null,
-                    "focused": false
-                  }]
-      }
+      type: Array
+      // default: function () {
+      //   return   [{
+      //               "imageUrl": null,
+      //               "name": "<p><br></p>",
+      //               "author": null,
+      //               "focused": false
+      //             }]
+      // }
     }
   },
   methods: {
@@ -261,8 +262,7 @@ var vm = new Vue({
       // Parse JSON string into object
       vm.headlines = JSON.parse(response);
     });
-    console.log(this.$el.firstChild);
-    Sortable.create(this.$el.firstChild, {
+    Sortable.create($(this.$el).find('.headlines-list')[0], {
       handle: ".glyphicon-move",
       draggable: 'li',
       animation: 500,
@@ -308,14 +308,13 @@ var vm = new Vue({
 
     splitThought: function (headline_index, thought_index) {
       var name_parts,
-          new_thought = {imageUrl: null, author: null, focused: false},
+          new_thought,
           current_thought = this.headlines[headline_index].thoughts[thought_index];
 
       name_parts = current_thought.name.split('<hr>');
       current_thought.name = name_parts[0];
       current_thought.focused = false;
-      new_thought.name = name_parts[1];
-      new_thought._id = GUID();
+      new_thought = new Thought(null, name_parts[1]),
       this.headlines[headline_index].thoughts.splice(thought_index + 1, 0, new_thought);
       this.$nextTick(function() {
         this.setFocus(headline_index, thought_index + 1, true);
@@ -323,7 +322,6 @@ var vm = new Vue({
     },
 
     setFocus: function (headline_index, thought_index, atStart) {
-      // atStart = atStart || true;
       var length = vm.headlines[headline_index].thoughts.length;
       if (length > 0) {
         if (thought_index > length) {

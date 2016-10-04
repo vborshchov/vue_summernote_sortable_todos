@@ -7,9 +7,11 @@ function Thought(id, name, author, hashtags, picture, repetition) {
   this.hashtags = hashtags || [];
   this.picture = picture;
   this.repetition = repetition || 0;
-  this.created_at = (function () {
-                var now = new Date();
-                var isoDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
-                return isoDate;
-              })();
+  this.created_at = Thought.getDate();
 }
+
+Thought.getDate = function () {
+  var now = new Date();
+  var isoDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+  return isoDate;
+};

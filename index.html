@@ -9,32 +9,50 @@
   <link rel="stylesheet" href="stylesheets/style.css">
 </head>
 <body>
-  <div class="container">
-    <div id="todos"><ul class="headlines-list">
-        <li
-          v-for="headline in headlines"
-          track-by="_id"
-          >
-          <input
-            type="text"
-            v-model="headline.name"
-            @keyup.enter="addThought"
-            class="headline-name">
-          <span class="glyphicon glyphicon-move"></span>
-          <p>
-            <small>{{headline._id}}</small>
-            <small>{{headline.created_at}}</small>
-          </p>
-          <thoughts-list :list="headline.thoughts" :index="$index"></thoughts-list>
+<div class="container" id="todos">
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="text-center">Help</h3>
+      <ul>
+        <li>Use<code>ctrl+enter</code>to split todo</li>
+        <li>To add new todo:
+          <ul>
+             <li>press <code>enter</code> in headline to add new todo</li>
+            <li>place cursor at the end of todo and press <code>ctrl+enter</code></li>
+          </ul>
         </li>
+        <li>You can drag and drop todos and headlines for sorting</li>
       </ul>
-
-<!--       <form @submit="addThought">
-        <input v-model="newThought.name" class="form-control" type="text" placeholder="Add some thought">
-      </form> -->
-      <pre>{{headlines | json}}</pre>
+      <div>
+        <h1 class="text-center">Todos</h1>
+        <div>
+          <ul class="headlines-list">
+          <li
+            v-for="headline in headlines"
+            track-by="_id"
+            >
+            <input
+              type="text"
+              v-model="headline.name"
+              @keyup.enter="addThought"
+              class="headline-name"
+              >
+            <span class="glyphicon glyphicon-move"></span>
+            <p>
+              <small>{{headline._id}}</small>
+              <small>{{headline.created_at}}</small>
+            </p>
+            <thoughts-list :list="headline.thoughts" :index="$index"></thoughts-list>
+          </li>
+        </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <pre>{{ headlines | json }}</pre>
     </div>
   </div>
+</div>
 
   <template id="thoughts-list-template">
     <ul
