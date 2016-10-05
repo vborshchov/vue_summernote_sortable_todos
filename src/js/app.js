@@ -131,6 +131,12 @@ var VueSummernote = Vue.extend({
               vm.setFocus(scope.$parent.index, scope.$index + 1, true);
               vm.removeThought(scope.$parent.index, scope.$index);
             }
+          } else if (lines > 8) {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(function() {
+              // Runs 100 miliseconds after the last change
+              vm.autoSplitThought(scope.$parent.index, scope.$index);
+            }, 100);
           }
         },
         onFocus: function() {
@@ -185,20 +191,9 @@ Vue.component('vue-summernote', VueSummernote);
 var ThoughtsList = Vue.extend({
   template: "#thoughts-list-template",
   props: {
-    // basic type check (`null` means accept any type)
     index: Number,
-    // object/array defaults should be returned from a
-    // factory function
     list: {
       type: Array
-      // default: function () {
-      //   return   [{
-      //               "imageUrl": null,
-      //               "name": "<p><br></p>",
-      //               "author": null,
-      //               "focused": false
-      //             }]
-      // }
     }
   },
   methods: {
@@ -248,6 +243,14 @@ var ThoughtsList = Vue.extend({
         vm.headlines[newHeadlineId].thoughts.splice(newThoughtId, 0, thought)
       }
     });
+    // $(this.$el).isotope({
+    //   layoutMode: 'cellsByRow',
+    //   itemSelector: '.thought',
+    //   cellsByRow: {
+    //     columnWidth: 220,
+    //     rowHeight: 220
+    //   }
+    // });
   }
 });
 
@@ -282,15 +285,18 @@ var vm = new Vue({
     focus_coordinates: {}
   },
 
-  // watch: {
-  //   'headlines': {
-  //     handler: function (val, oldVal) {
-  //       console.log('new: %s, old: %s', val, oldVal);
-  //       console.log('a thing changed');
-  //     },
-  //     deep: true
-  //   }
-  // },
+  watch: {
+    'headlines': {
+      handler: function (val, oldVal) {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(function() {
+          // Runs 2 second (2000 ms) after the last change
+          console.log("saving list...");
+        }, 2000);
+      },
+      deep: true
+    }
+  },
 
   methods: {
     addThought: function (e) {
@@ -313,11 +319,20 @@ var vm = new Vue({
       name_parts = current_thought.name.split('<hr>');
       current_thought.name = name_parts[0];
       current_thought.focused = false;
-      new_thought = new Thought(null, extractContent(name_parts[1])),
+      new_thought = new Thought(null, name_parts[1]),
       this.headlines[headline_index].thoughts.splice(thought_index + 1, 0, new_thought);
       this.$nextTick(function() {
         this.setFocus(headline_index, thought_index + 1, true);
       });
+    },
+
+    autoSplitThought: function(headlineId, thoughtId) {
+      var startTime = performance.now();
+
+      fibonacci(50) //just calc fibonacci number for spending some time
+
+      var endTime = performance.now();
+      console.log("auto splitting thought took " + (endTime - startTime) + " milliseconds.");
     },
 
     setFocus: function (headline_index, thought_index, atStart) {

@@ -6,8 +6,8 @@
 }
 
 .thought {
-  width: 50%;
-  margin: 10px auto;
+  width: 300px;
+  margin: 10px 5px;
   position: relative;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -22,7 +22,7 @@
 .note-editor {
   text-align: center;
   display: inline-block;
-  margin: 10px auto;
+  margin: auto;
   width: 95%;
 }
 
@@ -31,7 +31,13 @@
 }
 
 .thoughts-list {
+  margin: 0 -5px;
+  display: flex;
   min-height: 20px;
+  flex-flow: center;
+  flex-wrap: wrap;
+  justify-content: center;
+
 }
 
 .thoughts-list .glyphicon-move {
@@ -41,7 +47,7 @@
 }
 
 .headline-name {
-  width: 90%;
+  width: 97%;
 }
 
 .glyphicon-move:hover {
@@ -56,3 +62,4 @@
    applied to the element when moving
   transition: transform .5s cubic-bezier(.55,0,.1,1);
 }
+
