@@ -316,20 +316,20 @@ var vm = new Vue({
           new_thought,
           current_thought = this.headlines[headline_index].thoughts[thought_index];
 
-      name_parts = current_thought.name.split('<hr>');
-      current_thought.name = name_parts[0];
-      current_thought.focused = false;
-      new_thought = new Thought(null, name_parts[1]),
-      this.headlines[headline_index].thoughts.splice(thought_index + 1, 0, new_thought);
       this.$nextTick(function() {
+        name_parts = current_thought.name.split('<hr>');
+        current_thought.name = name_parts[0];
+        current_thought.focused = false;
+        new_thought = new Thought(null, name_parts[1]),
+        this.headlines[headline_index].thoughts.splice(thought_index + 1, 0, new_thought);
         this.setFocus(headline_index, thought_index + 1, true);
       });
     },
 
     autoSplitThought: function(headlineId, thoughtId) {
       var startTime = performance.now();
-
       fibonacci(50) //just calc fibonacci number for spending some time
+      console.log(lineWrapPositions(vm.headlines[headlineId].thoughts[thoughtId].name, "normal 14px Helvetica", 254.375));
 
       var endTime = performance.now();
       console.log("auto splitting thought took " + (endTime - startTime) + " milliseconds.");
