@@ -139,9 +139,6 @@ var VueSummernote = Vue.extend({
             "thought_id": scope.$index
           }
         },
-        onBlur: function() {
-          vm.focus_coordinates = {};
-        },
         onPaste: function (e) {
           var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
           var bufferTextWithHashtags = highlightHashTags(bufferText);
@@ -255,7 +252,7 @@ var ThoughtsList = Vue.extend({
 Vue.component('thoughts-list', ThoughtsList);
 
 var vm = new Vue({
-  el: '#todos',
+  el: '#thoughts',
 
   ready: function (value) {
     loadJSON(function(response) {
@@ -287,9 +284,15 @@ var vm = new Vue({
     'headlines': {
       handler: function (val, oldVal) {
         console.log('new: %s, old: %s', val, oldVal);
-        console.log('a thing changed');
       },
       deep: true
+    },
+    'focus_coordinates': {
+      handler: function (val, oldVal) {
+        console.log('new headline: %s, old headline: %s', val.headline_id, oldVal.headline_id);
+        $('.thoughts-list li').removeClass('focused')
+        $('.headlines-list li:eq( ' + val.headline_id + ' ) .thoughts-list li:eq( ' + val.thought_id + ' )').addClass('focused')
+      },
     }
   },
 
