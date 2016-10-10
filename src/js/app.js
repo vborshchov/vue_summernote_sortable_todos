@@ -305,8 +305,8 @@ var vm = new Vue({
     'focus_coordinates': {
       handler: function (val, oldVal) {
         console.log('new headline: %s, old headline: %s', val.headline_id, oldVal.headline_id);
-        $('.thoughts-list li').removeClass('focused')
-        $('.headlines-list li:eq( ' + val.headline_id + ' ) .thoughts-list li:eq( ' + val.thought_id + ' )').addClass('focused')
+        $('.thought').removeClass('focused')
+        $('.headline:eq( ' + val.headline_id + ' ) .thought:eq( ' + val.thought_id + ' )').addClass('focused')
       },
     }
   },
@@ -364,9 +364,9 @@ var vm = new Vue({
           atStart = true;
         }
         if (atStart) {
-          $(".headlines-list > li").eq(headline_index).find("[data-thought-id='" + thought_index + "'] textarea").summernote('focus');
+          $(".headline").eq(headline_index).find("[data-thought-id='" + thought_index + "'] textarea").summernote('focus');
         } else {
-          $(".headlines-list > li").eq(headline_index).find("[data-thought-id='" + thought_index + "'] .note-editable").placeCursorAtEnd();
+          $(".headline").eq(headline_index).find("[data-thought-id='" + thought_index + "'] .note-editable").placeCursorAtEnd();
         }
         this.focus_coordinates = {
           "headline_id": headline_index,
