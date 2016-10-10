@@ -46,6 +46,34 @@ describe("Html Splitter", function() {
     });
   });
 
+  describe("binSearchLineWrap()", function() {
+    var font = "normal 14px Helvetica";
+    var width = 254.594;
+
+    it("should return string length", function() {
+      var text = "text";
+      var result = binSearchLineWrap(text, font, width);
+      expect(result).toEqual(text.length);
+    });
+
+    it("should process empty string", function() {
+      var text = "";
+      var result = binSearchLineWrap(text, font, width);
+      expect(result).toEqual(0);
+    });
+
+    it("should find line wrap position at 39", function() {
+      var result = binSearchLineWrap(textFromValidHtml, font, width);
+      expect(result).toEqual(39);
+    });
+
+    it("should find line wrap position at 28", function() {
+      var text = "ÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿΑαΒβΓγΔδΕεΖζΗηΘθΙιΚκΛλ"
+      var result = binSearchLineWrap(text, font, width);
+      expect(result).toEqual(28);
+    });
+  });
+
   describe("splitHtmlByVisibleText()", function() {
     it("should return array", function() {
       var result = splitHtmlByVisibleText(validHtml, 5);

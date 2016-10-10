@@ -332,8 +332,13 @@ var vm = new Vue({
 
     autoSplitThought: function(headlineId, thoughtId) {
       var startTime = performance.now();
+      var name = vm.headlines[headlineId].thoughts[thoughtId].name;
       fibonacci(50) //just calc fibonacci number for spending some time
-      console.log(lineWrapPositions(vm.headlines[headlineId].thoughts[thoughtId].name, "normal 14px Helvetica", 254.375));
+      if (regex.HTML_TAGS.test(name)) {
+        console.log(binSearchLineWrap(getTextFromHtml(name), "normal 14px Helvetica", 254.594));
+      } else {
+        console.log(binSearchLineWrap(name, "normal 14px Helvetica", 254.594));
+      }
 
       var endTime = performance.now();
       console.log("auto splitting thought took " + (endTime - startTime) + " milliseconds.");
@@ -358,7 +363,7 @@ var vm = new Vue({
 
     deleteHeadline: function(index) {
       if (confirm("Are you sure to delete this headline?\nAll thoughts will be deleted too.")) {
-        this.headlines.splice(index, 1)
+        this.headlines.splice(index, 1);
       }
     }
   }
