@@ -151,6 +151,9 @@ var VueSummernote = Vue.extend({
             "thought_id": scope.$index
           }
         },
+        onBlur: function() {
+          vm.focus_coordinates = {}
+        },
         onPaste: function (e) {
           var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
           var bufferTextWithHashtags = highlightHashTags(bufferText);
