@@ -4,7 +4,10 @@ var regex = {
   HTML_TAGS: /(<\/?\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
   OPENED_TAGS: /(<\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
   CLOSED_TAGS: /(<\/\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
-  SELF_CLOSED_TAGS: /(<(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi
+  SELF_CLOSED_TAGS: /(<(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
+  SURROGATE_PAIR: /[\uD800-\uDBFF][\uDC00-\uDFFF]/gi,
+  // Match everything outside of normal chars and " (quote character)
+  NON_ALPHANUMERIC: /([^\#-~| |!])/g
 };
 
 function splitHtmlByVisibleText(html, visible_offset) {
@@ -16,6 +19,7 @@ function splitHtmlByVisibleText(html, visible_offset) {
       indexes.push([match.index, match.index+match[0].length]);
   if (0 < visible_offset && visible_offset < text.length) {
     var left_part = text.substring(0, visible_offset);
+    left_part = encodeEntities(left_part);
     indexes.forEach(function(el, index, array){
       if (left_part.length >= el[0]) {
         left_part = left_part.substr(0, el[0]) + html.substring(el[0], el[1]) + left_part.substr(el[0]);
@@ -88,4 +92,79 @@ function isCloseTag(str) {
 
 function isSelfClosedTag(str) {
   return !!str.match(regex.SELF_CLOSED_TAGS);
+}
+
+/**
+ * Escapes all potentially dangerous characters, so that the
+ * resulting string can be safely inserted into attribute or
+ * element text.
+ * @param value
+ * @returns {string} escaped text
+ */
+function encodeEntities(value) {
+  return value.
+    replace(/&/g, '&amp;').
+    // replace(regex.SURROGATE_PAIR, function(value) {
+    //   var hi = value.charCodeAt(0);
+    //   var low = value.charCodeAt(1);
+    //   return '&#' + (((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000) + ';';
+    // }).
+    // replace(regex.NON_ALPHANUMERIC, function(value) {
+    //   return '&#' + value.charCodeAt(0) + ';';
+    // }).
+    replace(/</g, '&lt;').
+    replace(/>/g, '&gt;');
+}
+
+function binSearchLineWrap(str, font, width) {
+  var l = 0,
+      r = str.length,
+      counter = 0,
+      middle = r + 1;
+
+  while (r - l > 1) {
+    counter += 1;
+    if (getTextWidth(str.substring(0, r), font) <= width) {
+      l = r;
+      middle = 1;
+      break;
+    }
+    var length = r - l;
+    middle = Math.floor(length/2);
+    if ( getTextWidth(str.substring(0, l + middle), font) >= width ) {
+      r = l + middle;
+    } else {
+      l = l + middle;
+    }
+  }
+  return l + middle - 1;
+}
+
+function getTextWidth(text, font) {
+  // if given, use cached canvas for better performance
+  // else, create new canvas
+  var canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+  var context = canvas.getContext("2d");
+  context.font = font;
+  var metrics = context.measureText(text);
+  return metrics.width;
+  // console.log(getTextWidth("hello there!", "normal 20px gillsans-light"));  // close to 86
+}
+
+function lineWrapPositions(row_text, font, width) {
+  var lengths = [],
+      text = row_text;
+
+  while (getTextWidth(text, font) > width) {
+    var position = binSearchLineWrap(text, font, width) - 1;
+    lengths.push(position);
+    text = text.substring(position);
+  }
+  return lengths;
+}
+
+function getTextFromHtml(html) {
+  var dummy_element = document.createElement('span');
+  $(dummy_element).html(html);
+  return $(dummy_element).html(html).text();
 }
