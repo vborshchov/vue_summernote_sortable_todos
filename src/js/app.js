@@ -131,6 +131,12 @@ var VueSummernote = Vue.extend({
               vm.setFocus(scope.$parent.index, scope.$index + 1, true);
               vm.removeThought(scope.$parent.index, scope.$index);
             }
+          } else if (lines > 8) {
+            clearTimeout(this.timer);
+            this.timer = setTimeout(function() {
+              // Runs 100 miliseconds after the last change
+              vm.autoSplitThought(scope.$parent.index, scope.$index);
+            }, 100);
           }
         },
         onFocus: function() {
@@ -182,25 +188,13 @@ Vue.component('vue-summernote', VueSummernote);
 var ThoughtsList = Vue.extend({
   template: "#thoughts-list-template",
   props: {
-    // basic type check (`null` means accept any type)
     index: Number,
-    // object/array defaults should be returned from a
-    // factory function
     list: {
       type: Array
-      // default: function () {
-      //   return   [{
-      //               "imageUrl": null,
-      //               "name": "<p><br></p>",
-      //               "author": null,
-      //               "focused": false
-      //             }]
-      // }
     }
   },
   methods: {
     makeHeadline: function (headlineId, thoughtId) {
-      console.log(headlineId, thoughtId);
       // extract thought from old headlines list in variable
       var thought = vm.headlines[headlineId].thoughts[thoughtId]
       var upperThoughts = vm.headlines[headlineId].thoughts.slice(0, thoughtId);
@@ -246,6 +240,14 @@ var ThoughtsList = Vue.extend({
         vm.headlines[newHeadlineId].thoughts.splice(newThoughtId, 0, thought)
       }
     });
+    // $(this.$el).isotope({
+    //   layoutMode: 'cellsByRow',
+    //   itemSelector: '.thought',
+    //   cellsByRow: {
+    //     columnWidth: 220,
+    //     rowHeight: 220
+    //   }
+    // });
   }
 });
 
@@ -283,7 +285,11 @@ var vm = new Vue({
   watch: {
     'headlines': {
       handler: function (val, oldVal) {
-        console.log('new: %s, old: %s', val, oldVal);
+        clearTimeout(this.timer);
+        this.timer = setTimeout(function() {
+          // Runs 2 second (2000 ms) after the last change
+          console.log("saving list...");
+        }, 2000);
       },
       deep: true
     },
@@ -324,6 +330,15 @@ var vm = new Vue({
       });
     },
 
+    autoSplitThought: function(headlineId, thoughtId) {
+      var startTime = performance.now();
+
+      fibonacci(50) //just calc fibonacci number for spending some time
+
+      var endTime = performance.now();
+      console.log("auto splitting thought took " + (endTime - startTime) + " milliseconds.");
+    },
+
     setFocus: function (headline_index, thought_index, atStart) {
       var length = vm.headlines[headline_index].thoughts.length;
       if (length > 0) {
@@ -338,6 +353,12 @@ var vm = new Vue({
         } else {
           $(".headlines-list > li").eq(headline_index).find("[data-thought-id='" + thought_index + "'] .note-editable").placeCursorAtEnd();
         }
+      }
+    },
+
+    deleteHeadline: function(index) {
+      if (confirm("Are you sure to delete this headline?\nAll thoughts will be deleted too.")) {
+        this.headlines.splice(index, 1)
       }
     }
   }

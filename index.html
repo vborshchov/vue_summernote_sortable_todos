@@ -11,7 +11,7 @@
 <body>
 <div class="container" id="thoughts">
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
       <h3 class="text-center">Help</h3>
       <ul>
         <li>Use<code>ctrl+enter</code>to split thought</li>
@@ -21,7 +21,8 @@
             <li>place cursor at the end of thought and press <code>ctrl+enter</code></li>
           </ul>
         </li>
-        <li>You can drag and drop thoughts and headlines for sorting</li>
+        <li>You can drag and drop todos and headlines for sorting</li>
+        <li>To delete headline or todo just delete all its content</li>
       </ul>
       <div>
         <h1 class="text-center">Thoughts</h1>
@@ -35,6 +36,7 @@
               type="text"
               v-model="headline.name"
               @keyup.enter="addThought"
+              @keydown="headline.name.length === 0 ? deleteHeadline($index) : null"
               class="headline-name"
               >
             <span class="glyphicon glyphicon-move"></span>
@@ -48,7 +50,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-5">
+    <div class="col-md-12">
       <pre>{{ headlines | json }}</pre>
     </div>
   </div>
@@ -80,16 +82,16 @@
     </ul>
   </template>
 
-  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
-  <script src="js/utils.js"></script>
+  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.min.js"></script>
   <script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.js"></script>
-  <script src="lib/vue-animated-list.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js"></script>
-  <script src="lib/GUID.min.js"></script>
-  <script src="lib/shortcut.js"></script>
-  <script src="js/thought.js"></script>
-  <script src="js/app.js"></script>
+
+  <script src="src/js/utils.js"></script>
+  <script src="src/lib/GUID.min.js"></script>
+  <script src="src/lib/shortcut.js"></script>
+  <script src="src/js/thought.js"></script>
+  <script src="src/js/app.js"></script>
 </body>
 </html>
