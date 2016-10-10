@@ -1,5 +1,7 @@
 'use strict'
 
+Vue.config.debug = true;
+
 function getSelectionStart() {
   var node = document.getSelection().anchorNode;
   return (node.nodeType == 3 ? node.parentNode : node);
@@ -125,15 +127,15 @@ var VueSummernote = Vue.extend({
           console.log(lines);
           if (lines === 0 || vm.headlines[scope.$parent.index].thoughts[scope.$index].name === "<p><br></p>" || vm.headlines[scope.$parent.index].thoughts[scope.$index].name === "<br>") {
             if (e.keyCode == 8) { // if `Backspace` key pressed
-              vm.$nextTick(function(){
-                vm.setFocus(scope.$parent.index, scope.$index-1);
-              });
               vm.removeThought(scope.$parent.index, scope.$index);
+              vm.$nextTick(function(){
+                vm.setFocus(scope.$parent.index, scope.$index - 1);
+              });
             } else if (e.keyCode == 46){ // if `Delete` key pressed
-              vm.$nextTick(function(){
-                vm.setFocus(scope.$parent.index, scope.$index + 1, true);
-              });
               vm.removeThought(scope.$parent.index, scope.$index);
+              vm.$nextTick(function(){
+                vm.setFocus(scope.$parent.index, scope.$index, true);
+              });
             }
           } else if (lines > 8) {
             clearTimeout(this.timer);
@@ -308,6 +310,7 @@ var vm = new Vue({
       vm.headlines[index].thoughts.unshift(new Thought());
       this.$nextTick(function() {
         this.setFocus(index, 0);
+        console.log(this.focus_coordinates.thought_id)
       });
     },
 
@@ -350,13 +353,17 @@ var vm = new Vue({
         if (thought_index > length) {
           thought_index = length - 1;
         } else if (thought_index < 0) {
-          thought_index = 1;
+          thought_index = 0;
           atStart = true;
         }
         if (atStart) {
           $(".headlines-list > li").eq(headline_index).find("[data-thought-id='" + thought_index + "'] textarea").summernote('focus');
         } else {
           $(".headlines-list > li").eq(headline_index).find("[data-thought-id='" + thought_index + "'] .note-editable").placeCursorAtEnd();
+        }
+        this.focus_coordinates = {
+          "headline_id": headline_index,
+          "thought_id": thought_index
         }
       }
     },
@@ -368,5 +375,3 @@ var vm = new Vue({
     }
   }
 });
-
-Vue.config.debug = true;
