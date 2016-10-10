@@ -125,10 +125,14 @@ var VueSummernote = Vue.extend({
           console.log(lines);
           if (lines === 0 || vm.headlines[scope.$parent.index].thoughts[scope.$index].name === "<p><br></p>" || vm.headlines[scope.$parent.index].thoughts[scope.$index].name === "<br>") {
             if (e.keyCode == 8) { // if `Backspace` key pressed
-              vm.setFocus(scope.$parent.index, scope.$index-1);
+              vm.$nextTick(function(){
+                vm.setFocus(scope.$parent.index, scope.$index-1);
+              });
               vm.removeThought(scope.$parent.index, scope.$index);
             } else if (e.keyCode == 46){ // if `Delete` key pressed
-              vm.setFocus(scope.$parent.index, scope.$index + 1, true);
+              vm.$nextTick(function(){
+                vm.setFocus(scope.$parent.index, scope.$index + 1, true);
+              });
               vm.removeThought(scope.$parent.index, scope.$index);
             }
           } else if (lines > 8) {
@@ -257,7 +261,7 @@ var ThoughtsList = Vue.extend({
 Vue.component('thoughts-list', ThoughtsList);
 
 var vm = new Vue({
-  el: '#todos',
+  el: '#thoughts',
 
   ready: function (value) {
     loadJSON(function(response) {
@@ -316,12 +320,12 @@ var vm = new Vue({
           new_thought,
           current_thought = this.headlines[headline_index].thoughts[thought_index];
 
+      name_parts = current_thought.name.split('<hr>');
+      current_thought.name = name_parts[0];
+      current_thought.focused = false;
+      new_thought = new Thought(null, name_parts[1]),
+      this.headlines[headline_index].thoughts.splice(thought_index + 1, 0, new_thought);
       this.$nextTick(function() {
-        name_parts = current_thought.name.split('<hr>');
-        current_thought.name = name_parts[0];
-        current_thought.focused = false;
-        new_thought = new Thought(null, name_parts[1]),
-        this.headlines[headline_index].thoughts.splice(thought_index + 1, 0, new_thought);
         this.setFocus(headline_index, thought_index + 1, true);
       });
     },

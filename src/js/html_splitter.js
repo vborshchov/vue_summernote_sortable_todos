@@ -119,11 +119,18 @@ function encodeEntities(value) {
 function binSearchLineWrap(str, font, width) {
   var l = 0,
       r = str.length,
-      middle;
+      counter = 0,
+      middle = r;
 
   while (r - l > 1) {
+    counter += 1;
+    if (getTextWidth(str.substring(0, r), font) <= width) {
+      l = r;
+      middle = 0;
+      break;
+    }
     var length = r - l;
-    middle = Math.floor(length/2);
+    middle = Math.round(length/2);
     if ( getTextWidth(str.substring(0, l + middle), font) >= width ) {
       r = l + middle;
     } else {
