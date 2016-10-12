@@ -64,7 +64,7 @@ describe("Html Splitter", function() {
 
     it("should find line wrap position at 39", function() {
       var result = binSearchLineWrap(textFromValidHtml, font, width);
-      expect(result).toEqual(39);
+      expect(result).toEqual(38);
     });
 
     it("should find line wrap position at 28", function() {
