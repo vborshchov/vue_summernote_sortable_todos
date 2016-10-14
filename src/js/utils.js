@@ -92,3 +92,25 @@ function fibonacci(num, memo) {
 
   return memo[num] = fibonacci(num - 1, memo) + fibonacci(num - 2, memo);
 }
+
+String.prototype.regexLastIndexOf = function(re, startPos) {
+    startPos = startPos === undefined ? this.length : startPos;
+
+    if (!re.global) {
+        var flags = "g" + (re.multiline?"m":"") + (re.ignoreCase?"i":"");
+        re = new RegExp(re.source, flags);
+    }
+
+    var lastSuccess = -1;
+    for (var pos = 0; pos <= startPos; pos++) {
+        re.lastIndex = pos;
+
+        var match = re.exec(this);
+        if (!match) break;
+
+        pos = match.index;
+        if (pos <= startPos) lastSuccess = pos;
+    }
+
+    return lastSuccess;
+};

@@ -109,13 +109,47 @@ var vm = new Vue({
     autoSplitThought: function(headlineId, thoughtId) {
       var startTime = performance.now();
       var name = vm.headlines[headlineId].thoughts[thoughtId].name;
-      fibonacci(50) //just calc fibonacci number for spending some time
-      if (regex.HTML_TAGS.test(name)) {
-        console.log(binSearchLineWrap(getTextFromHtml(name), "normal 14px Helvetica", 254.594));
-      } else {
-        console.log(binSearchLineWrap(name, "normal 14px Helvetica", 254.594));
-      }
+      var rows = name.split(regex.P_TAGS)
+      var lines = [];
+      // fibonacci(50) //just calc fibonacci number for spending some time
+      rows.forEach(function(element, index, array) {
+        while (element !== undefined && element !== null && element !== '') {
+          var result,
+              text = getTextFromHtml(element),
+              splitPosition = binSearchLineWrap(text, "normal 14px Helvetica", 254.594),
+              line = text.substring(text, splitPosition),
+              lastSpaceIndex = line.regexLastIndexOf(/ /);
 
+          if (lastSpaceIndex > -1) {
+            var result = splitHtmlByVisibleText(element, lastSpaceIndex);
+          } else {
+            var result = splitHtmlByVisibleText(element, splitPosition);
+          }
+          var tmp_text0 = getTextFromHtml(result[0]);
+          var tmp_text1 = getTextFromHtml(result[1]);
+          if (tmp_text0[tmp_text0.length - 1] !== ' ' && tmp_text1[0] == ' ') {
+            result[0] = result[0] + ' ';
+            result[1] = result[1].substring(1);
+          }
+          lines.push(result[0]);
+          element = result[1]
+        }
+        // var re = new RegExp(String.fromCharCode(160), "g"); // String.fromCharCode(160) === &nbsp;
+        // var lastNBSPIndex = text.regexLastIndexOf(re);
+        // var lastIndex = Math.max(lastSpaceIndex, lastNBSPIndex);
+        // if (lastIndex > -1) {
+        //   if (lastIndex == text.length - 1){
+        //     positions.push([el, lastIndex-1]);
+        //   } else {
+        //     positions.push([el, lastIndex]);
+        //   }
+        // }
+      });
+      lines = lines.map(function(element) {
+        return "<p>" + element + "</p>";
+      });
+      console.log(lines);
+      // vm.headlines[headlineId].thoughts[thoughtId].name = lines.join('');
       var endTime = performance.now();
       console.log("auto splitting thought took " + (endTime - startTime) + " milliseconds.");
     },
