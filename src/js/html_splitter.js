@@ -2,6 +2,7 @@
 
 var regex = {
   HTML_TAGS: /(<\/?\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
+  P_TAGS: /(<\/?p((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
   OPENED_TAGS: /(<\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
   CLOSED_TAGS: /(<\/\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
   SELF_CLOSED_TAGS: /(<(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
@@ -11,12 +12,15 @@ var regex = {
 };
 
 function splitHtmlByVisibleText(html, visible_offset) {
-  var match, indexes= [];
+  var match = null,
+      indexes= [];
   var dummy_element = document.createElement('span');
   $(dummy_element).html(html);
   var text = $(dummy_element).html(html).text();
-  while ((match = regex.HTML_TAGS.exec(html)) !== null )
+  regex.HTML_TAGS.lastIndex = 0;
+  while ((match = regex.HTML_TAGS.exec(html)) !== null ) {
       indexes.push([match.index, match.index+match[0].length]);
+  }
   if (0 < visible_offset && visible_offset < text.length) {
     var left_part = text.substring(0, visible_offset);
     left_part = encodeEntities(left_part);
