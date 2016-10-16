@@ -2,7 +2,7 @@
 
 var regex = {
   HTML_TAGS: /(<\/?\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
-  P_TAGS: /(<\/?p((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
+  P_TAGS: /<\/?p((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>/gi,
   OPENED_TAGS: /(<\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
   CLOSED_TAGS: /(<\/\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
   SELF_CLOSED_TAGS: /(<(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[\^'">\s]+))?)+\s*|\s*)\/?>)/gi,
