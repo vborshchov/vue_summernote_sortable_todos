@@ -106,9 +106,9 @@ var vm = new Vue({
       });
     },
 
-    autoSplitThought: function(headlineId, thoughtId) {
+    autoSplitThought: function(headlineId, thoughtId, code) {
       var startTime = performance.now();
-      var name = vm.headlines[headlineId].thoughts[thoughtId].name;
+      var name = code;
       var rows = name.split(regex.P_TAGS)
       var lines = [];
       // fibonacci(50) //just calc fibonacci number for spending some time
@@ -149,7 +149,7 @@ var vm = new Vue({
         return "<p>" + element + "</p>";
       });
       console.log(lines);
-      // vm.headlines[headlineId].thoughts[thoughtId].name = lines.join('');
+      vm.headlines[headlineId].thoughts[thoughtId].name = lines.join('');
       var endTime = performance.now();
       console.log("auto splitting thought took " + (endTime - startTime) + " milliseconds.");
     },
