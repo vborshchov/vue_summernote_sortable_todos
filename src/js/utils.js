@@ -10,7 +10,7 @@ $.fn.extend({
       if (lastChild) {
         range.setStart(it, 0);
         range.setEndAfter(lastChild);
-        return Math.round(range.getBoundingClientRect().height / lineHeight);
+        return Math.ceil(range.getBoundingClientRect().height / lineHeight);
       } else {
         return 0;
       }

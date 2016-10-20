@@ -142,9 +142,9 @@ var vm = new Vue({
         // var lastNBSPIndex = text.regexLastIndexOf(re);
         // var lastIndex = Math.max(lastSpaceIndex, lastNBSPIndex);
       });
-      // lines = lines.map(function(element) {
-      //   return "<p>" + element + "</p>";
-      // });
+      lines = lines.map(function(element) {
+        return "<p>" + element + "</p>";
+      });
       console.log(lines);
 
       var i,
@@ -155,9 +155,9 @@ var vm = new Vue({
       for (i=0,j=lines.length; i<j; i+=chunk) {
         tmpArray = lines.slice(i,i+chunk);
         if (i === 0) {
-          vm.headlines[headlineId].thoughts[thoughtId].name = "<p>" + tmpArray.join('') + "</p>";
+          vm.headlines[headlineId].thoughts[thoughtId].name = tmpArray.join('');
         } else {
-          var new_thought = new Thought(null, "<p>" + tmpArray.join('') + "</p>");
+          var new_thought = new Thought(null, tmpArray.join(''));
           vm.headlines[headlineId].thoughts.splice(thoughtId + new_thought_counter, 0, new_thought)
         }
         new_thought_counter += 1;
