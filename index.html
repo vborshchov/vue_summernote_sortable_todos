@@ -70,7 +70,7 @@
           data-headline-id="{{index}}"
           data-thought-id="{{$index}}"
           >
-          {{index}}
+          <sup>headline: {{index}}, thought: {{$index}}</sup>
           <div class="wrapper text-center">
               <img class="img-circle" :src="thought.picture">
               <vue-summernote name="html-editor" :content.sync="thought.name" ></vue-summernote>

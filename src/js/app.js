@@ -117,39 +117,55 @@ var vm = new Vue({
           var result,
               text = getTextFromHtml(element),
               splitPosition = binSearchLineWrap(text, "normal 14px Helvetica", 254.594),
-              line = text.substring(text, splitPosition),
-              lastSpaceIndex = line.regexLastIndexOf(/ /);
+              before_char = text[splitPosition-1],
+              after_char = text[splitPosition];
 
-          if (lastSpaceIndex > -1) {
-            var result = splitHtmlByVisibleText(element, lastSpaceIndex);
-          } else {
-            var result = splitHtmlByVisibleText(element, splitPosition);
+          if (after_char !== undefined) {
+            if (before_char !== ' ' && after_char === " ") {
+              splitPosition += 1;
+            } else {
+              var line = text.substring(text, splitPosition),
+                  lastSeparatorIndex = line.regexLastIndexOf(/ |-|\)\(|}{|\]\[|></);
+
+              if ( lastSeparatorIndex > -1 ) {
+                splitPosition = lastSeparatorIndex + 1
+              }
+            }
           }
-          var tmp_text0 = getTextFromHtml(result[0]);
-          var tmp_text1 = getTextFromHtml(result[1]);
-          if (tmp_text0[tmp_text0.length - 1] !== ' ' && tmp_text1[0] == ' ') {
-            result[0] = result[0] + ' ';
-            result[1] = result[1].substring(1);
-          }
+
+          result = splitHtmlByVisibleText(element, splitPosition);
+
           lines.push(result[0]);
           element = result[1]
         }
         // var re = new RegExp(String.fromCharCode(160), "g"); // String.fromCharCode(160) === &nbsp;
         // var lastNBSPIndex = text.regexLastIndexOf(re);
         // var lastIndex = Math.max(lastSpaceIndex, lastNBSPIndex);
-        // if (lastIndex > -1) {
-        //   if (lastIndex == text.length - 1){
-        //     positions.push([el, lastIndex-1]);
-        //   } else {
-        //     positions.push([el, lastIndex]);
-        //   }
-        // }
       });
-      lines = lines.map(function(element) {
-        return "<p>" + element + "</p>";
-      });
+      // lines = lines.map(function(element) {
+      //   return "<p>" + element + "</p>";
+      // });
       console.log(lines);
-      vm.headlines[headlineId].thoughts[thoughtId].name = lines.join('');
+
+      var i,
+          j,
+          new_thought_counter = 0,
+          tmpArray,
+          chunk = 8;
+      for (i=0,j=lines.length; i<j; i+=chunk) {
+        tmpArray = lines.slice(i,i+chunk);
+        if (i === 0) {
+          vm.headlines[headlineId].thoughts[thoughtId].name = "<p>" + tmpArray.join('') + "</p>";
+        } else {
+          var new_thought = new Thought(null, "<p>" + tmpArray.join('') + "</p>");
+          vm.headlines[headlineId].thoughts.splice(thoughtId + new_thought_counter, 0, new_thought)
+        }
+        new_thought_counter += 1;
+      }
+
+      this.$nextTick(function() {
+        this.setFocus(headlineId, thoughtId + new_thought_counter - 1);
+      });
       var endTime = performance.now();
       console.log("auto splitting thought took " + (endTime - startTime) + " milliseconds.");
     },
