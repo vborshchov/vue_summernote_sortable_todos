@@ -96,7 +96,7 @@ var VueSummernote = Vue.extend({
         onKeyup: function(e) {
           var $it = $(this);
           var lines = $(e.target).getLines();
-          console.log(lines);
+          // console.log(lines);
           if (lines === 0 || vm.headlines[scope.$parent.index].thoughts[scope.$index].name === "<p><br></p>" || vm.headlines[scope.$parent.index].thoughts[scope.$index].name === "<br>") {
             if (e.keyCode == 8) { // if `Backspace` key pressed
               vm.removeThought(scope.$parent.index, scope.$index);

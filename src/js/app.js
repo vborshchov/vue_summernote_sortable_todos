@@ -146,7 +146,7 @@ var vm = new Vue({
       lines = lines.map(function(element) {
         return "<p>" + element + "</p>";
       });
-      console.log(lines);
+      // console.log(lines);
 
       var i,
           j,
