@@ -115,7 +115,7 @@ var VueSummernote = Vue.extend({
               // Runs 100 miliseconds after the last change
               var code = e.target.innerHTML
               vm.autoSplitThought(scope.$parent.index, scope.$index, code);
-            }, 100);
+            }, 250);
           }
         },
         onFocus: function() {
