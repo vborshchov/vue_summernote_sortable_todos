@@ -109,9 +109,10 @@ var vm = new Vue({
     autoSplitThought: function(headlineId, thoughtId, code) {
       var startTime = performance.now();
       var name = code;
-      var rows = name.split(regex.P_TAGS)
+      var rows = name.split(regex.P_TAGS).filter(function(v){
+        return (v !== '' && v !== undefined);
+      });
       var lines = [];
-      // fibonacci(50) //just calc fibonacci number for spending some time
       rows.forEach(function(element, index, array) {
         while (element !== undefined && element !== null && element !== '') {
           var result,
@@ -125,7 +126,7 @@ var vm = new Vue({
               splitPosition += 1;
             } else {
               var line = text.substring(text, splitPosition),
-                  lastSeparatorIndex = line.regexLastIndexOf(/ |-|\)\(|}{|\]\[|></);
+                  lastSeparatorIndex = line.regexLastIndexOf(/ |-|.\(|.{|.\[|.<|\?/);
 
               if ( lastSeparatorIndex > -1 ) {
                 splitPosition = lastSeparatorIndex + 1
@@ -142,22 +143,23 @@ var vm = new Vue({
         // var lastNBSPIndex = text.regexLastIndexOf(re);
         // var lastIndex = Math.max(lastSpaceIndex, lastNBSPIndex);
       });
-      // lines = lines.map(function(element) {
-      //   return "<p>" + element + "</p>";
-      // });
-      console.log(lines);
+      lines = lines.map(function(element) {
+        return "<p>" + element + "</p>";
+      });
+      // console.log(lines);
 
       var i,
           j,
           new_thought_counter = 0,
           tmpArray,
           chunk = 8;
+
       for (i=0,j=lines.length; i<j; i+=chunk) {
         tmpArray = lines.slice(i,i+chunk);
         if (i === 0) {
-          vm.headlines[headlineId].thoughts[thoughtId].name = "<p>" + tmpArray.join('') + "</p>";
+          vm.headlines[headlineId].thoughts[thoughtId].name = tmpArray.join('');
         } else {
-          var new_thought = new Thought(null, "<p>" + tmpArray.join('') + "</p>");
+          var new_thought = new Thought(null, tmpArray.join(''));
           vm.headlines[headlineId].thoughts.splice(thoughtId + new_thought_counter, 0, new_thought)
         }
         new_thought_counter += 1;
